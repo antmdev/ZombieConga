@@ -122,26 +122,34 @@ UPDATE VIEW
 /*****************************************************
 SPRITE MOVEMENT
 ******************************************************/
+    
+//    OLD
+    
+//    func move(sprite: SKSpriteNode, velocity: CGPoint)
+//    {
+//        let amountToMove = CGPoint(x: velocity.x * CGFloat(dt),
+//                                   y: velocity.y * CGFloat(dt))
+//        print("Amount to move: \(amountToMove)")
+//        sprite.position = CGPoint(
+//            x: sprite.position.x + amountToMove.x,
+//            y: sprite.position.y + amountToMove.y)
+//    }
+    
+//    NEW CODE USING MATHS LIBRARY
+    
     func move(sprite: SKSpriteNode, velocity: CGPoint)
     {
-        // 1
-        let amountToMove = CGPoint(x: velocity.x * CGFloat(dt), y: velocity.y * CGFloat(dt))
+        let amountToMove = velocity * CGFloat(dt)
         print("Amount to move: \(amountToMove)")
-        // 2
-        sprite.position = CGPoint(
-            x: sprite.position.x + amountToMove.x, y: sprite.position.y + amountToMove.y)
+        sprite.position += amountToMove
     }
  
     // SPRITE OFFSET MOVEMENT
     func moveZombieToward(location: CGPoint)
     {
-
-        let offset = CGPoint(x: location.x - zombie.position.x, y: location.y - zombie.position.y)
-        let length = sqrt(Double(offset.x * offset.x + offset.y * offset.y))
-        
-        //normalise the vector so that it becomes a unit vector (i.e moves somewhere)
-        let direction = CGPoint(x: offset.x / CGFloat(length), y: offset.y / CGFloat(length))
-        velocity = CGPoint(x: direction.x * zombieMovePointsPerSec, y: direction.y * zombieMovePointsPerSec)
+        let offset = location - zombie.position
+        let direction = offset.normalized()
+        velocity = direction * zombieMovePointsPerSec
     }
     
 /*****************************************************
