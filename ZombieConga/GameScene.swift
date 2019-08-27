@@ -24,6 +24,7 @@ GAME CONSTANTS
     var velocity = CGPoint.zero
     let playableRect: CGRect                    //store the playable area
     var lastTouchLocation: CGPoint?             //Setting a last touchlocation to stop the zombie moving
+    let zombieRotateRadiansPerSec:CGFloat = 4.0 * π //help smoothing rotation
     
     
 /*****************************************************
@@ -125,14 +126,12 @@ UPDATE VIEW
             } else
             {
                 move(sprite: zombie, velocity: velocity)
-                rotate(sprite: zombie, direction: velocity)
+                rotate(sprite: zombie, direction: velocity, rotateRadiansPerSec: zombieRotateRadiansPerSec)
             }
         }
         
         boundsCheckZombie() //call method to bounce off walls
 
-        
-        rotate(sprite: zombie, direction: velocity)  //CALL ROTATION METHOD
     }
 
     
@@ -242,13 +241,20 @@ TOUCH CONTROLS MOVEMENT
     }
     
     // ROTATE ZOMBIE
-    func rotate(sprite: SKSpriteNode, direction: CGPoint)
+//    func rotate(sprite: SKSpriteNode, direction: CGPoint)
+//    {
+////  OLD
+////        sprite.zRotation = CGFloat(atan2(Double(direction.y), Double(direction.x)))
+//
+////  NEW
+//        sprite.zRotation = direction.angle
+//    }
+//
+    func rotate(sprite: SKSpriteNode, direction: CGPoint, rotateRadiansPerSec: CGFloat)
     {
-//  OLD
-//        sprite.zRotation = CGFloat(atan2(Double(direction.y), Double(direction.x)))
-        
-//  NEW
-        sprite.zRotation = direction.angle
+        let shortest = shortestAngleBetween(angle1: sprite.zRotation, angle2: velocity.angle)
+        let amountToRotate = min(rotateRadiansPerSec * CGFloat(dt), abs(shortest))
+        sprite.zRotation += shortest.sign() * amountToRotate
     }
     
     

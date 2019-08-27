@@ -10,6 +10,9 @@ import Foundation
 import CoreGraphics
 
 
+
+//MATHEMATICAL VECTOR BASED HELP ROUTINES
+
 func + (left: CGPoint, right: CGPoint) -> CGPoint {
     return CGPoint(x: left.x + right.x, y: left.y + right.y)
 }
@@ -70,5 +73,29 @@ extension CGPoint {
     }
     var angle: CGFloat {
         return atan2(y, x)
+    }
+}
+
+//HELPER  ROUTINES TO SMOOTH OUT ROTATION
+//Basically works out whether its quicker to turn left or right based on the shortest angle.
+
+let π = CGFloat.pi
+func shortestAngleBetween(angle1: CGFloat, angle2: CGFloat) -> CGFloat // returns the shortest angle between two angles.
+{
+    let twoπ = π * 2.0
+    var angle = (angle2 - angle1)
+        .truncatingRemainder(dividingBy: twoπ)
+    if angle >= π {
+        angle = angle - twoπ
+    }
+    if angle <= -π {
+        angle = angle + twoπ
+    }
+    return angle
+}
+extension CGFloat {
+    func sign() -> CGFloat // Sign() returns 1 if the CGFloat is greater than or equal to 0; otherwise it returns -1.
+    {
+        return self >= 0.0 ? 1.0 : -1.0
     }
 }
