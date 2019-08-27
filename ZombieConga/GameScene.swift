@@ -23,6 +23,7 @@ GAME CONSTANTS
     let zombieMovePointsPerSec: CGFloat = 480.0 // zombie should move around 1/4 of screen in 1 second
     var velocity = CGPoint.zero
     let playableRect: CGRect                    //store the playable area
+    var lastTouchLocation: CGPoint?             //Setting a last touchlocation to stop the zombie moving
     
     
 /*****************************************************
@@ -112,6 +113,22 @@ UPDATE VIEW
         move(sprite: zombie, velocity: velocity)
 //        move(sprite: zombie, velocity: CGPoint(x: zombieMovePointsPerSec, y: 0))
         
+//ADDING A SETTING TO STOP THE ZOMBIE FROM MOVING AFTER CLICKING
+        
+        if let lastTouchLocation = lastTouchLocation
+        {
+            let diff = lastTouchLocation - zombie.position
+            if diff.length() <= zombieMovePointsPerSec * CGFloat(dt)
+            {
+                zombie.position = lastTouchLocation
+                velocity = CGPoint.zero
+            } else
+            {
+                move(sprite: zombie, velocity: velocity)
+                rotate(sprite: zombie, direction: velocity)
+            }
+        }
+        
         boundsCheckZombie() //call method to bounce off walls
 
         
@@ -160,6 +177,7 @@ TOUCH CONTROLS MOVEMENT
     
     func sceneTouched(touchLocation:CGPoint)
     {
+        lastTouchLocation = touchLocation //stopping zombie
         moveZombieToward(location: touchLocation)
     }
     
@@ -226,7 +244,11 @@ TOUCH CONTROLS MOVEMENT
     // ROTATE ZOMBIE
     func rotate(sprite: SKSpriteNode, direction: CGPoint)
     {
-        sprite.zRotation = CGFloat(atan2(Double(direction.y), Double(direction.x)))
+//  OLD
+//        sprite.zRotation = CGFloat(atan2(Double(direction.y), Double(direction.x)))
+        
+//  NEW
+        sprite.zRotation = direction.angle
     }
     
     

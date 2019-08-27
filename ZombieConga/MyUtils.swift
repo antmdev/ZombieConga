@@ -58,6 +58,9 @@ func sqrt(a: CGFloat) -> CGFloat {
     return CGFloat(sqrtf(Float(a)))
 }
 #endif
+
+//the class extension adds some handy methods to get the length of the point, return a normalized version of the point (i.e., length 1) and get the angle of the point.
+
 extension CGPoint {
     func length() -> CGFloat {
         return sqrt(x*x + y*y)
