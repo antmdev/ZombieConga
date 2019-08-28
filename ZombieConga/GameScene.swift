@@ -80,7 +80,7 @@ BACKGROUND
         print("Size: \(mySize)")
         
         
-// SPRITE
+// SPRITE ZOMBIE
         zombie.position = CGPoint(x:400, y: 400)
 //        zombie.anchorPoint = CGPoint(x: 0.5, y: 0.5)
 //        zombie1.setScale(2) // SKNode method
@@ -88,8 +88,17 @@ BACKGROUND
         addChild(zombie)
         
         debugDrawPlayableArea() //call the debug playable area
+
+// SPRITE ENEMY
+        //New SPawn enemy in randomised locatin function
+        //create a sequence of calling spawnEnemy() and waiting two seconds, and repeat this sequence forever.
+        //Note: You are using a weak reference to self here. Otherwise the closure passed to run(_ block:) will create a strong reference cycle and result in a memory leak.
         
-        spawnEnemy() //SPawn the enemy
+        run(SKAction.repeatForever(SKAction.sequence([SKAction.run()
+            {
+                [weak self] in self?.spawnEnemy()
+            },
+                SKAction.wait(forDuration: 2.0)])))
         
     }
     
@@ -265,33 +274,45 @@ TOUCH CONTROLS MOVEMENT
     
     func spawnEnemy()
     {
+        let enemy = SKSpriteNode(imageNamed: "enemy")
+        enemy.position = CGPoint(
+            x: size.width + enemy.size.width/2,
+            //modified the fixed y-position to be a random value between the bottom and top of the playable rectangle
+            y: CGFloat.random(
+                min: playableRect.minY + enemy.size.height/2,
+                max: playableRect.maxY - enemy.size.height/2))
+        addChild(enemy)
+        
+        let actionMove = SKAction.moveTo(x: -enemy.size.width/2, duration: 2.0)
+        enemy.run(actionMove)
+    }
        
 
-// V SHAPED ENEMY MOVEMENT MOVE.BY VERSION
-    let enemy = SKSpriteNode(imageNamed: "enemy")       //Select sprite
-        enemy.position = CGPoint(x:size.width + enemy.size.width/2, y:size.height/2)  //Set starting position
-                addChild(enemy)
-        
-    let actionMidMove = SKAction.moveBy(
-        x: -size.width/2-enemy.size.width/2,
-        y: -playableRect.height/2 + enemy.size.height/2,
-        duration: 1.0)
-    let actionMove = SKAction.moveBy(
-        x: -size.width/2-enemy.size.width/2,
-        y: playableRect.height/2 - enemy.size.height/2,
-        duration: 1.0)
-    let wait = SKAction.wait(forDuration: 0.5)
-    let logMessage = SKAction.run()
-        {
-            print("Reached bottom!")
-        }
-        
-//Reverse the sequence
-        let halfSequence = SKAction.sequence([actionMidMove, logMessage, wait, actionMove])
-        let sequence = SKAction.sequence([halfSequence, halfSequence.reversed()])
-        
-        enemy.run(sequence)
-    }
+//// V SHAPED ENEMY MOVEMENT MOVE.BY VERSION
+//    let enemy = SKSpriteNode(imageNamed: "enemy")       //Select sprite
+//        enemy.position = CGPoint(x:size.width + enemy.size.width/2, y:size.height/2)  //Set starting position
+//                addChild(enemy)
+//
+//    let actionMidMove = SKAction.moveBy(
+//        x: -size.width/2-enemy.size.width/2,
+//        y: -playableRect.height/2 + enemy.size.height/2,
+//        duration: 1.0)
+//    let actionMove = SKAction.moveBy(
+//        x: -size.width/2-enemy.size.width/2,
+//        y: playableRect.height/2 - enemy.size.height/2,
+//        duration: 1.0)
+//    let wait = SKAction.wait(forDuration: 0.5)
+//    let logMessage = SKAction.run()
+//        {
+//            print("Reached bottom!")
+//        }
+//
+////Reverse the sequence
+//        let halfSequence = SKAction.sequence([actionMidMove, logMessage, wait, actionMove])
+//        let sequence = SKAction.sequence([halfSequence, halfSequence.reversed()])
+//
+//        enemy.run(sequence)
+//    }
         
 //    //V SHAPED ENEMY MOVEMENT MOVE.TO VERSION
 //    let enemy = SKSpriteNode(imageNamed: "enemy")       //Select sprite

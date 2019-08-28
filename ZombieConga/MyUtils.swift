@@ -93,9 +93,24 @@ func shortestAngleBetween(angle1: CGFloat, angle2: CGFloat) -> CGFloat // return
     }
     return angle
 }
+
 extension CGFloat {
     func sign() -> CGFloat // Sign() returns 1 if the CGFloat is greater than or equal to 0; otherwise it returns -1.
     {
         return self >= 0.0 ? 1.0 : -1.0
+    }
+}
+
+//helper method to generate a random number within a range of values.
+extension CGFloat
+{
+    static func random() -> CGFloat // gives a random number between 0 and 1,
+    {
+        return CGFloat(Float(arc4random()) / Float(UInt32.max))
+    }
+    static func random(min: CGFloat, max: CGFloat) -> CGFloat //gives random number between specified minimum and maximum values
+    {
+        assert(min < max)
+        return CGFloat.random() * (max - min) + min
     }
 }
