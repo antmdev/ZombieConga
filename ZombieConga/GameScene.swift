@@ -89,6 +89,8 @@ BACKGROUND
         
         debugDrawPlayableArea() //call the debug playable area
         
+        spawnEnemy()
+        
     }
     
 /*****************************************************
@@ -131,7 +133,7 @@ UPDATE VIEW
         }
         
         boundsCheckZombie() //call method to bounce off walls
-
+        
     }
 
     
@@ -255,6 +257,23 @@ TOUCH CONTROLS MOVEMENT
         let shortest = shortestAngleBetween(angle1: sprite.zRotation, angle2: velocity.angle)
         let amountToRotate = min(rotateRadiansPerSec * CGFloat(dt), abs(shortest))
         sprite.zRotation += shortest.sign() * amountToRotate
+    }
+    
+/*****************************************************
+ SPAWN ENEMY
+ ******************************************************/
+    
+    func spawnEnemy()
+    {
+        //position enemy just outside RHS of screen
+        let enemy = SKSpriteNode(imageNamed: "enemy")
+        enemy.position = CGPoint(x:size.width + enemy.size.width/2, y:size.height/2)
+        addChild(enemy)
+        
+        //move enemy right to left
+        let actionMove = SKAction.move(to: CGPoint(x: -enemy.size.width/2, y: enemy.position.y),
+            duration: 5.0)
+        enemy.run(actionMove)
     }
     
     
