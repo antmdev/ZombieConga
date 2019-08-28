@@ -89,7 +89,7 @@ BACKGROUND
         
         debugDrawPlayableArea() //call the debug playable area
         
-        spawnEnemy()
+        spawnEnemy() //SPawn the enemy
         
     }
     
@@ -265,16 +265,38 @@ TOUCH CONTROLS MOVEMENT
     
     func spawnEnemy()
     {
-        //position enemy just outside RHS of screen
-        let enemy = SKSpriteNode(imageNamed: "enemy")
-        enemy.position = CGPoint(x:size.width + enemy.size.width/2, y:size.height/2)
-        addChild(enemy)
+       
+//V SHAPED ENEMY MOVEMENT
+    let enemy = SKSpriteNode(imageNamed: "enemy")       //Select sprite
         
-        //move enemy right to left
-        let actionMove = SKAction.move(to: CGPoint(x: -enemy.size.width/2, y: enemy.position.y),
-            duration: 5.0)
-        enemy.run(actionMove)
+        enemy.position = CGPoint(x:size.width + enemy.size.width/2, y:size.height/2)  //Set starting position
+                addChild(enemy)
+    // 1
+    let actionMidMove = SKAction.move(to: CGPoint(x: size.width/2, y: playableRect.minY + enemy.size.height/2),
+        duration: 2.5) //Move to bottom middle screen
+    // 2
+    let actionMove = SKAction.move(to: CGPoint(x: -enemy.size.width/2, y: enemy.position.y),duration: 2.5) //Move to far leftr middle screen
+    // 3
+    let sequence = SKAction.sequence([actionMidMove, actionMove]) //Combine the two actions in a sequence
+    // 4
+    enemy.run(sequence)
     }
+    
+//    1. Here, you create a new move action, just like you did before, except this time it represents the “mid-point” of the action — the bottom middle of the playable rectangle.
+//    2. This is the same move action as before, except you’ve decreased the duration to 1.0, since it will now represent moving only half the distance: from the bottom of the “V”, to the left side of the screen.
+//    3. Here’s the new sequence action! As you can see, it’s incredibly simple — you use the sequence(_:) constructor and pass in an Array of actions. The sequence action will run one action after another.
+//    4. You call run(_:) in the same way as before, but pass in the sequence action this time.
+    
+//STRAIGHT LINE ENEMY MOVEMENT
+//        //position enemy just outside RHS of screen in vertical center
+//        let enemy = SKSpriteNode(imageNamed: "enemy")
+//        enemy.position = CGPoint(x:size.width + enemy.size.width/2, y:size.height/2)
+//        addChild(enemy)
+//
+//        //move enemy right to left, action moves a node relative to its current position.
+//        let actionMove = SKAction.move(to: CGPoint(x: -enemy.size.width/2, y: enemy.position.y),
+//            duration: 5.0)
+//        enemy.run(actionMove)
     
     
 
