@@ -110,7 +110,7 @@ UPDATE VIEW
         }
         
         lastUpdateTime = currentTime
-        print("\(dt*1000) milliseconds since last update")
+//        print("\(dt*1000) milliseconds since last update")
 
 // passes in velocity (updated based on the touch)
         move(sprite: zombie, velocity: velocity)
@@ -158,7 +158,7 @@ SPRITE MOVEMENT
     func move(sprite: SKSpriteNode, velocity: CGPoint)
     {
         let amountToMove = velocity * CGFloat(dt)
-        print("Amount to move: \(amountToMove)")
+//        print("Amount to move: \(amountToMove)")
         sprite.position += amountToMove
     }
  
@@ -266,21 +266,56 @@ TOUCH CONTROLS MOVEMENT
     func spawnEnemy()
     {
        
-//V SHAPED ENEMY MOVEMENT
+
+// V SHAPED ENEMY MOVEMENT MOVE.BY VERSION
     let enemy = SKSpriteNode(imageNamed: "enemy")       //Select sprite
-        
         enemy.position = CGPoint(x:size.width + enemy.size.width/2, y:size.height/2)  //Set starting position
                 addChild(enemy)
-    // 1
-    let actionMidMove = SKAction.move(to: CGPoint(x: size.width/2, y: playableRect.minY + enemy.size.height/2),
-        duration: 2.5) //Move to bottom middle screen
-    // 2
-    let actionMove = SKAction.move(to: CGPoint(x: -enemy.size.width/2, y: enemy.position.y),duration: 2.5) //Move to far leftr middle screen
-    // 3
-    let sequence = SKAction.sequence([actionMidMove, actionMove]) //Combine the two actions in a sequence
-    // 4
-    enemy.run(sequence)
+        
+    let actionMidMove = SKAction.moveBy(
+        x: -size.width/2-enemy.size.width/2,
+        y: -playableRect.height/2 + enemy.size.height/2,
+        duration: 1.0)
+    let actionMove = SKAction.moveBy(
+        x: -size.width/2-enemy.size.width/2,
+        y: playableRect.height/2 - enemy.size.height/2,
+        duration: 1.0)
+    let wait = SKAction.wait(forDuration: 0.5)
+    let logMessage = SKAction.run()
+        {
+            print("Reached bottom!")
+        }
+        
+//Reverse the sequence
+        let halfSequence = SKAction.sequence([actionMidMove, logMessage, wait, actionMove])
+        let sequence = SKAction.sequence([halfSequence, halfSequence.reversed()])
+        
+        enemy.run(sequence)
     }
+        
+//    //V SHAPED ENEMY MOVEMENT MOVE.TO VERSION
+//    let enemy = SKSpriteNode(imageNamed: "enemy")       //Select sprite
+//    
+//    enemy.position = CGPoint(x:size.width + enemy.size.width/2, y:size.height/2)  //Set starting position
+//    addChild(enemy)
+//    // 1
+//    let actionMidMove = SKAction.move(to: CGPoint(x: size.width/2, y: playableRect.minY + enemy.size.height/2),
+//        duration: 1.5) //Move to bottom middle screen
+//    // 2
+//    let actionMove = SKAction.move(to: CGPoint(x: -enemy.size.width/1, y: enemy.position.y),duration: 1.5) //Move to far leftr middle screen
+//    // 3
+//    let wait = SKAction.wait(forDuration: 1) //pause enemy on bottom of the screen
+//    let logMessage = SKAction.run()
+//        {
+//            print("Reached bottom!")
+//        }
+//    let sequence = SKAction.sequence([actionMidMove, logMessage, wait, actionMove])
+//    // 4
+//    enemy.run(sequence)
+//    }
+
+//    Anna
+//    reservations@orteapalace.com
     
 //    1. Here, you create a new move action, just like you did before, except this time it represents the “mid-point” of the action — the bottom middle of the playable rectangle.
 //    2. This is the same move action as before, except you’ve decreased the duration to 1.0, since it will now represent moving only half the distance: from the bottom of the “V”, to the left side of the screen.
