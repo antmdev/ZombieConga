@@ -26,6 +26,10 @@ GAME CONSTANTS
     var lastTouchLocation: CGPoint?             //Setting a last touchlocation to stop the zombie moving
     let zombieRotateRadiansPerSec:CGFloat = 4.0 * π //help smoothing rotation
     let zombieAnimation: SKAction
+    let catCollisionSound: SKAction = SKAction.playSoundFileNamed( //Cat hit sound
+        "hitCat.wav", waitForCompletion: false)
+    let enemyCollisionSound: SKAction = SKAction.playSoundFileNamed( //Enemy hit sound
+        "hitCatLady.wav", waitForCompletion: false)
     
     
 /*****************************************************
@@ -175,8 +179,13 @@ UPDATE VIEW
         
         boundsCheckZombie() //call method to bounce off walls
         
-        checkCollisions() // check for collisions
+//        checkCollisions() // check for collisions
         
+    }
+    
+    override func didEvaluateActions() //improves frame rate so updateing collisions isnt 1 frame behind.
+    {
+        checkCollisions()
     }
 
     
@@ -363,6 +372,7 @@ TOUCH CONTROLS MOVEMENT
         let actions = [appear, groupWait, disappear, removeFromParent] //set sequence
         cat.run(SKAction.sequence(actions))
     }
+    
 /*****************************************************
  COLLISION DETECTION
  ******************************************************/
@@ -394,6 +404,10 @@ TOUCH CONTROLS MOVEMENT
         for cat in hitCats
         {
             zombieHit(cat: cat)
+            
+            //SOUND EFFECT CAT
+//            run(SKAction.playSoundFileNamed("hitCat.wav", waitForCompletion: false))
+            run(catCollisionSound) //can now call the constant property and will stop delay of sound on first call.
         }
         
         var hitEnemies: [SKSpriteNode] = []
@@ -410,10 +424,15 @@ TOUCH CONTROLS MOVEMENT
         for enemy in hitEnemies
         {
             zombieHit(enemy: enemy)
+            
+            //SOUND EFFECT ENEMY
+            run(enemyCollisionSound) 
         }
     }
 
-        
+/*****************************************************
+ SOUND EFFECTS!!!
+ ******************************************************/
         
 
     
