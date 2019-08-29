@@ -25,6 +25,7 @@ GAME CONSTANTS
     let playableRect: CGRect                    //store the playable area
     var lastTouchLocation: CGPoint?             //Setting a last touchlocation to stop the zombie moving
     let zombieRotateRadiansPerSec:CGFloat = 4.0 * π //help smoothing rotation
+    let zombieAnimation: SKAction
     
     
 /*****************************************************
@@ -40,6 +41,31 @@ INITIALISE PLAYABLE AREA
                               width: size.width,
                               height: playableHeight)
         // 4   You put it all together to make a rectangle with the maximum aspect ratio, centered on the screen.
+        
+        
+///////////////////////////////
+// ZOMBIE ANIMATION ACTION!!!
+///////////////////////////////
+        // 1 create an array that will store all of the textures to run in the animation.
+        
+        var textures:[SKTexture] = []
+        
+        // 2 loop that creates a string for each image name and then makes a texture object from each name using the SKTexture(imageNamed:) initializer.
+        
+        for i in 1...4 {
+            textures.append(SKTexture(imageNamed: "zombie\(i)"))
+        }
+        
+        // 3 frames 3 and 2 to the list
+        
+        textures.append(textures[2])
+        textures.append(textures[1])
+        
+        // 4 create and run an action with animate
+        
+        zombieAnimation = SKAction.animate(with: textures,
+                                           timePerFrame: 0.1)
+        
         super.init(size: size) // 5 You call the initializer of the superclass.
     }
     
@@ -68,11 +94,8 @@ BACKGROUND
     {
         backgroundColor = SKColor.black
         let background = SKSpriteNode(imageNamed: "background1")
-//        background.position = CGPoint(x: size.width/2, y: size.height/2)
-//        background.anchorPoint = CGPoint.zero
         background.anchorPoint = CGPoint(x: 0.5, y: 0.5) //default
         background.position = CGPoint(x: size.width/2, y: size.height/2)
-//        background.zRotation = CGFloat.pi / 8
         background.zPosition = -1 //ensure background is behind all sprites
         addChild(background)
         
@@ -82,10 +105,10 @@ BACKGROUND
         
 // SPRITE ZOMBIE
         zombie.position = CGPoint(x:400, y: 400)
-//        zombie.anchorPoint = CGPoint(x: 0.5, y: 0.5)
-//        zombie1.setScale(2) // SKNode method
         
         addChild(zombie)
+        
+//        zombie.run(SKAction.repeatForever(zombieAnimation)) //Runs the animation for the zombie
         
         debugDrawPlayableArea() //call the debug playable area
 
@@ -134,6 +157,8 @@ UPDATE VIEW
             {
                 zombie.position = lastTouchLocation
                 velocity = CGPoint.zero
+                stopZombieAnimation() //STOPS zombie animation after movement
+
             } else
             {
                 move(sprite: zombie, velocity: velocity)
@@ -150,18 +175,6 @@ UPDATE VIEW
 SPRITE MOVEMENT
 ******************************************************/
     
-//    OLD
-    
-//    func move(sprite: SKSpriteNode, velocity: CGPoint)
-//    {
-//        let amountToMove = CGPoint(x: velocity.x * CGFloat(dt),
-//                                   y: velocity.y * CGFloat(dt))
-//        print("Amount to move: \(amountToMove)")
-//        sprite.position = CGPoint(
-//            x: sprite.position.x + amountToMove.x,
-//            y: sprite.position.y + amountToMove.y)
-//    }
-    
 //    NEW CODE USING MATHS LIBRARY
     
     func move(sprite: SKSpriteNode, velocity: CGPoint)
@@ -174,6 +187,8 @@ SPRITE MOVEMENT
     // SPRITE OFFSET MOVEMENT
     func moveZombieToward(location: CGPoint)
     {
+        startZombieAnimation() //calls the zombie animation function
+        
         let offset = location - zombie.position
         let direction = offset.normalized()
         velocity = direction * zombieMovePointsPerSec
@@ -250,17 +265,8 @@ TOUCH CONTROLS MOVEMENT
             velocity.y = -velocity.y
         }
     }
-    
-    // ROTATE ZOMBIE
-//    func rotate(sprite: SKSpriteNode, direction: CGPoint)
-//    {
-////  OLD
-////        sprite.zRotation = CGFloat(atan2(Double(direction.y), Double(direction.x)))
-//
-////  NEW
-//        sprite.zRotation = direction.angle
-//    }
-//
+
+    //Rotate Zombie
     func rotate(sprite: SKSpriteNode, direction: CGPoint, rotateRadiansPerSec: CGFloat)
     {
         let shortest = shortestAngleBetween(angle1: sprite.zRotation, angle2: velocity.angle)
@@ -284,9 +290,71 @@ TOUCH CONTROLS MOVEMENT
         addChild(enemy)
         
         let actionMove = SKAction.moveTo(x: -enemy.size.width/2, duration: 2.0)
-        enemy.run(actionMove)
+      
+        //REMOVE NODES ONCE THEY'RE NOT REQUIRED
+        let actionRemove = SKAction.removeFromParent()
+        //RUN SEQUENCE
+        enemy.run(SKAction.sequence([actionMove, actionRemove]))
     }
-       
+  
+/*****************************************************
+ ZOMBIE ANIMATION ACTION!!
+ ******************************************************/
+    
+    func startZombieAnimation() //tags animations with a Key called animation
+    {
+        if zombie.action(forKey: "animation") == nil // uses forKey - to check another version of animation isn't already running
+        {
+            zombie.run(SKAction.repeatForever(zombieAnimation),
+                withKey: "animation")
+        }
+        
+    }
+    func stopZombieAnimation() //stops the zombie animation by removing the action
+    {
+        zombie.removeAction(forKey: "animation")
+    }
+    
+/*****************************************************
+ SCALE ACTION SPAWN CATS
+ ******************************************************/
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+/*****************************************************
+NOTES
+ ******************************************************/
+
+//BACKGROUND
+//        background.position = CGPoint(x: size.width/2, y: size.height/2)
+//        background.anchorPoint = CGPoint.zero
+//        background.zRotation = CGFloat.pi / 8
+    
+//SPRITE
+//        zombie.anchorPoint = CGPoint(x: 0.5, y: 0.5)
+//        zombie1.setScale(2) // SKNode method
+
+    
+//    OLD - SPrite movement
+
+//    func move(sprite: SKSpriteNode, velocity: CGPoint)
+//    {
+//        let amountToMove = CGPoint(x: velocity.x * CGFloat(dt),
+//                                   y: velocity.y * CGFloat(dt))
+//        print("Amount to move: \(amountToMove)")
+//        sprite.position = CGPoint(
+//            x: sprite.position.x + amountToMove.x,
+//            y: sprite.position.y + amountToMove.y)
+//    }
+
 
 //// V SHAPED ENEMY MOVEMENT MOVE.BY VERSION
 //    let enemy = SKSpriteNode(imageNamed: "enemy")       //Select sprite
@@ -342,6 +410,7 @@ TOUCH CONTROLS MOVEMENT
 //    2. This is the same move action as before, except you’ve decreased the duration to 1.0, since it will now represent moving only half the distance: from the bottom of the “V”, to the left side of the screen.
 //    3. Here’s the new sequence action! As you can see, it’s incredibly simple — you use the sequence(_:) constructor and pass in an Array of actions. The sequence action will run one action after another.
 //    4. You call run(_:) in the same way as before, but pass in the sequence action this time.
+   
     
 //STRAIGHT LINE ENEMY MOVEMENT
 //        //position enemy just outside RHS of screen in vertical center
@@ -355,6 +424,17 @@ TOUCH CONTROLS MOVEMENT
 //        enemy.run(actionMove)
     
     
+    
+// ROTATE ZOMBIE
+//    func rotate(sprite: SKSpriteNode, direction: CGPoint)
+//    {
+////  OLD
+////        sprite.zRotation = CGFloat(atan2(Double(direction.y), Double(direction.x)))
+//
+////  NEW
+//        sprite.zRotation = direction.angle
+//    }
+//
 
 }
 
