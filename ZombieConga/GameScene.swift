@@ -336,11 +336,28 @@ TOUCH CONTROLS MOVEMENT
         addChild(cat)
         
         let appear = SKAction.scale(to: 1.0, duration: 0.5)//grows from nothing to max in 0.5 seconds
-        let wait = SKAction.wait(forDuration: 10.0) // 10 seconds before next spawn
-        let dissapear = SKAction.scale(to: 0, duration: 0.5) //reduce to zero after time limit
+       //adding cat wiggle motion
+        cat.zRotation = -π / 16.0 //rotate cat 1/16 of pi ( negative rotations go clockwise)
+        let leftWiggle = SKAction.rotate(byAngle: π/8.0, duration: 0.5) //rotates counterclockwise by 22.5
+        let rightWiggle = leftWiggle.reversed() //reverse the above
+        let fullWiggle = SKAction.sequence([leftWiggle, rightWiggle]) //combines in a sequence
+//        let wiggleWait = SKAction.repeat(fullWiggle, count: 10) // repeat sequence 10 times over 10 seconds
+        
+        //adding scale in group action
+        let scaleUp = SKAction.scale(by: 1.2, duration: 0.25)
+        let scaleDown = scaleUp.reversed()
+        let fullScale = SKAction.sequence(
+            [scaleUp, scaleDown, scaleUp, scaleDown])
+        let group = SKAction.group([fullScale, fullWiggle])
+        let groupWait = SKAction.repeat(group, count: 10)
+        
+        //remove cat
+        let disappear = SKAction.scale(to: 0, duration: 0.5) //reduce size to zero after time limit
         let removeFromParent = SKAction.removeFromParent() //remove sprite
-        let actions = [appear, wait, dissapear, removeFromParent] //set sequence
+        let actions = [appear, groupWait, disappear, removeFromParent] //set sequence
         cat.run(SKAction.sequence(actions))
+        
+//GROUP ACTION FOR COMBINING SEQUENCES
     }
     
     
