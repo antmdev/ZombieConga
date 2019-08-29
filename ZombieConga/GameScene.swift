@@ -175,6 +175,8 @@ UPDATE VIEW
         
         boundsCheckZombie() //call method to bounce off walls
         
+        checkCollisions() // check for collisions
+        
     }
 
     
@@ -282,7 +284,7 @@ TOUCH CONTROLS MOVEMENT
     }
     
 /*****************************************************
- SPAWN ENEMY
+ SPAWN ENEMY CAT LADY
  ******************************************************/
     
     func spawnEnemy()
@@ -302,6 +304,8 @@ TOUCH CONTROLS MOVEMENT
         let actionRemove = SKAction.removeFromParent()
         //RUN SEQUENCE
         enemy.run(SKAction.sequence([actionMove, actionRemove]))
+        
+        enemy.name = "enemy" // set name for enemys for collision
     }
   
 /*****************************************************
@@ -328,6 +332,8 @@ TOUCH CONTROLS MOVEMENT
     func spawnCat() //spawn cat  in random positions accross max playable area
     {
         let cat = SKSpriteNode(imageNamed: "cat")
+        cat.name = "cat" //name cat for collisions
+        
         cat.position = CGPoint(
             x:CGFloat.random(min: playableRect.minX, max: playableRect.maxX),
             y:CGFloat.random(min: playableRect.minY, max: playableRect.maxY)
@@ -343,7 +349,7 @@ TOUCH CONTROLS MOVEMENT
         let fullWiggle = SKAction.sequence([leftWiggle, rightWiggle]) //combines in a sequence
 //        let wiggleWait = SKAction.repeat(fullWiggle, count: 10) // repeat sequence 10 times over 10 seconds
         
-        //adding scale in group action
+        //GROUP ACTION FOR COMBINING SEQUENCES
         let scaleUp = SKAction.scale(by: 1.2, duration: 0.25)
         let scaleDown = scaleUp.reversed()
         let fullScale = SKAction.sequence(
@@ -356,9 +362,60 @@ TOUCH CONTROLS MOVEMENT
         let removeFromParent = SKAction.removeFromParent() //remove sprite
         let actions = [appear, groupWait, disappear, removeFromParent] //set sequence
         cat.run(SKAction.sequence(actions))
-        
-//GROUP ACTION FOR COMBINING SEQUENCES
     }
+/*****************************************************
+ COLLISION DETECTION
+ ******************************************************/
+        
+    func zombieHit(cat:SKSpriteNode)
+    {
+        cat.removeFromParent()
+    }
+    
+    func zombieHit(enemy:SKSpriteNode)
+    {
+        enemy.removeFromParent()
+    }
+    
+    func checkCollisions()
+    {
+        var hitCats: [SKSpriteNode] = [] //set empty array for any sprite named cat
+        enumerateChildNodes(withName: "cat")
+        {
+            node, _ in
+            let cat = node as! SKSpriteNode
+            
+            if cat.frame.intersects(self.zombie.frame) //check if the frame of the cat or enemy intersects with the frame of the zombie.
+            {
+                hitCats.append(cat) //If there is an intersection, add the name cat or enemy to an array to keep track of it.
+            }
+        }
+        
+        for cat in hitCats
+        {
+            zombieHit(cat: cat)
+        }
+        
+        var hitEnemies: [SKSpriteNode] = []
+        enumerateChildNodes(withName: "enemy")
+        {
+            node, _ in
+            let enemy = node as! SKSpriteNode
+            
+            if node.frame.insetBy(dx: 20, dy: 20).intersects(self.zombie.frame) //shrink bounding box slightly as collision area is square over entire ping file including white space
+            {
+                hitEnemies.append(enemy)
+            }
+        }
+        for enemy in hitEnemies
+        {
+            zombieHit(enemy: enemy)
+        }
+    }
+
+        
+        
+
     
     
     
