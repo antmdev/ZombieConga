@@ -112,7 +112,7 @@ BACKGROUND
         
         debugDrawPlayableArea() //call the debug playable area
 
-// SPRITE ENEMY
+// SPRITE ENEMY SEQUENCE RUN
         //New SPawn enemy in randomised locatin function
         //create a sequence of calling spawnEnemy() and waiting two seconds, and repeat this sequence forever.
         //Note: You are using a weak reference to self here. Otherwise the closure passed to run(_ block:) will create a strong reference cycle and result in a memory leak.
@@ -122,6 +122,13 @@ BACKGROUND
                 [weak self] in self?.spawnEnemy()
             },
                 SKAction.wait(forDuration: 2.0)])))
+        
+// SPRITE CATS SEQUENCE RUN
+        run(SKAction.repeatForever(SKAction.sequence([SKAction.run()
+            {
+                [weak self] in self?.spawnCat()
+            },
+                SKAction.wait(forDuration: 1.0)])))
         
     }
     
@@ -318,7 +325,23 @@ TOUCH CONTROLS MOVEMENT
 /*****************************************************
  SCALE ACTION SPAWN CATS
  ******************************************************/
-
+    func spawnCat() //spawn cat  in random positions accross max playable area
+    {
+        let cat = SKSpriteNode(imageNamed: "cat")
+        cat.position = CGPoint(
+            x:CGFloat.random(min: playableRect.minX, max: playableRect.maxX),
+            y:CGFloat.random(min: playableRect.minY, max: playableRect.maxY)
+        )
+        cat.setScale(0) //start scale at 0
+        addChild(cat)
+        
+        let appear = SKAction.scale(to: 1.0, duration: 0.5)//grows from nothing to max in 0.5 seconds
+        let wait = SKAction.wait(forDuration: 10.0) // 10 seconds before next spawn
+        let dissapear = SKAction.scale(to: 0, duration: 0.5) //reduce to zero after time limit
+        let removeFromParent = SKAction.removeFromParent() //remove sprite
+        let actions = [appear, wait, dissapear, removeFromParent] //set sequence
+        cat.run(SKAction.sequence(actions))
+    }
     
     
     
