@@ -30,7 +30,7 @@ GAME CONSTANTS
         "hitCat.wav", waitForCompletion: false)
     let enemyCollisionSound: SKAction = SKAction.playSoundFileNamed( //Enemy hit sound
         "hitCatLady.wav", waitForCompletion: false)
-    
+     var invincible = false
     
 /*****************************************************
 INITIALISE PLAYABLE AREA
@@ -113,8 +113,7 @@ BACKGROUND
         addChild(zombie)
         
 //        zombie.run(SKAction.repeatForever(zombieAnimation)) //Runs the animation for the zombie
-        
-        debugDrawPlayableArea() //call the debug playable area
+    
 
 // SPRITE ENEMY SEQUENCE RUN
         //New SPawn enemy in randomised locatin function
@@ -133,6 +132,8 @@ BACKGROUND
                 [weak self] in self?.spawnCat()
             },
                 SKAction.wait(forDuration: 1.0)])))
+        
+        debugDrawPlayableArea() //call the debug playable area
         
     }
     
@@ -179,14 +180,9 @@ UPDATE VIEW
         
         boundsCheckZombie() //call method to bounce off walls
         
-//        checkCollisions() // check for collisions
-        
     }
     
-    override func didEvaluateActions() //improves frame rate so updateing collisions isnt 1 frame behind.
-    {
-        checkCollisions()
-    }
+   
 
     
 /*****************************************************
@@ -330,10 +326,18 @@ TOUCH CONTROLS MOVEMENT
         }
         
     }
+    
     func stopZombieAnimation() //stops the zombie animation by removing the action
     {
         zombie.removeAction(forKey: "animation")
     }
+    
+    
+
+
+
+
+    
     
 /*****************************************************
  SCALE ACTION SPAWN CATS
@@ -380,11 +384,26 @@ TOUCH CONTROLS MOVEMENT
     func zombieHit(cat:SKSpriteNode)
     {
         cat.removeFromParent()
+        run(catCollisionSound)
     }
     
-    func zombieHit(enemy:SKSpriteNode)
-    {
-        enemy.removeFromParent()
+    func zombieHit(enemy: SKSpriteNode) {
+        invincible = true
+        let blinkTimes = 10.0
+        let duration = 3.0
+        let blinkAction = SKAction.customAction(withDuration: duration) { node, elapsedTime in
+            let slice = duration / blinkTimes
+            let remainder = Double(elapsedTime).truncatingRemainder(
+                dividingBy: slice)
+            node.isHidden = remainder > slice / 2
+        }
+        let setHidden = SKAction.run() { [weak self] in
+            self?.zombie.isHidden = false
+            self?.invincible = false
+        }
+        zombie.run(SKAction.sequence([blinkAction, setHidden]))
+        
+        run(enemyCollisionSound)
     }
     
     func checkCollisions()
@@ -407,8 +426,13 @@ TOUCH CONTROLS MOVEMENT
             
             //SOUND EFFECT CAT
 //            run(SKAction.playSoundFileNamed("hitCat.wav", waitForCompletion: false))
-            run(catCollisionSound) //can now call the constant property and will stop delay of sound on first call.
+           //can now call the constant property and will stop delay of sound on first call.
         }
+        
+        if invincible {
+            return
+        }
+        
         
         var hitEnemies: [SKSpriteNode] = []
         enumerateChildNodes(withName: "enemy")
@@ -425,8 +449,11 @@ TOUCH CONTROLS MOVEMENT
         {
             zombieHit(enemy: enemy)
             
-            //SOUND EFFECT ENEMY
-            run(enemyCollisionSound) 
+        }
+    }
+        
+        override func didEvaluateActions() { //speeds up frame rate
+            checkCollisions()
         }
     }
 
@@ -552,7 +579,7 @@ NOTES
 //    }
 //
 
-}
+
 
 
 
