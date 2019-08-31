@@ -30,7 +30,8 @@ GAME CONSTANTS
         "hitCat.wav", waitForCompletion: false)
     let enemyCollisionSound: SKAction = SKAction.playSoundFileNamed( //Enemy hit sound
         "hitCatLady.wav", waitForCompletion: false)
-     var invincible = false
+    var invincible = false //set the status of the zombie when not contacted by enemy
+    let catMovePointsPerSec: CGFloat = 480.0    // keep track of move points per second
     
 /*****************************************************
 INITIALISE PLAYABLE AREA
@@ -109,6 +110,7 @@ BACKGROUND
         
 // SPRITE ZOMBIE
         zombie.position = CGPoint(x:400, y: 400)
+        zombie.zPosition = 100 // so he stays above the cats!
         
         addChild(zombie)
         
@@ -179,6 +181,8 @@ UPDATE VIEW
         }
         
         boundsCheckZombie() //call method to bounce off walls
+        
+        moveTrain()   // move cats train to follow you
         
     }
     
@@ -383,8 +387,18 @@ TOUCH CONTROLS MOVEMENT
         
     func zombieHit(cat:SKSpriteNode)
     {
-        cat.removeFromParent()
+//let train = SKSpriteNode(imageNamed: "cat")
+        cat.name = "train"
+        cat.removeAllActions()
+        cat.setScale(1.0)
+        cat.zRotation = 0
+        
+        let turnGreen = SKAction.colorize(with: SKColor.green, colorBlendFactor: 1.0, duration: 0.2)
+        cat.run(turnGreen)
+       
         run(catCollisionSound)
+  
+        
     }
     
     func zombieHit(enemy: SKSpriteNode) {
@@ -455,14 +469,36 @@ TOUCH CONTROLS MOVEMENT
         override func didEvaluateActions() { //speeds up frame rate
             checkCollisions()
         }
-    }
+    
+    func moveTrain()
+    {
+        var targetPosition = zombie.position //create variable based on zombie position
+        
+        enumerateChildNodes(withName: "train")  // enumerate all children with the word train
+        {
+            node, stop in
+            if !node.hasActions()    //if the node doesn't have actions (i.e all have been removed from cat)
+            {
+                let actionDuration = 0.3
+                let offset = targetPosition - node.position     //offset is difference between zombie and cat
+                let direction = offset.normalized()             //normalise the offset into a unit vector
+                let amountToMovePerSec = direction * self.catMovePointsPerSec       //velocity = the direction times cat MPS
+                let amountToMove = amountToMovePerSec * CGFloat(actionDuration)     //distance = speed x time
+                let moveAction = SKAction.moveBy(x: amountToMove.x, y: amountToMove.y, duration: actionDuration) //sequence
+                node.run(moveAction)
+            }
+            targetPosition = node.position
+        }
+        
+    }// MOVETRAIN()
+    
+} //FINAL CLOSING BRACKET CLASS
 
 /*****************************************************
- SOUND EFFECTS!!!
+CATS FOLLOW ZOMBIE IN THE TRAIN
  ******************************************************/
         
 
-    
     
     
     
@@ -579,7 +615,19 @@ NOTES
 //    }
 //
 
+//BLINK ACTION DEMO
 
+//As an example, here's an explanation of the blink action demo in ActionsCatalog:
+//
+//1) Divide the duration by the number of blinks desired in that time period. Call that a "slice" of time. In each slice, the node should be visible for half the time, and invisible for the other half. That is what will make the node appear to blink.
+//
+//2) The truncatingRemainder method returns the remainder of the first parameter (elapsedTime) after being divided by the second parameter (slice). So in this example, it gives you the amount of time that has elapsed in this "slice" calculated earlier.
+//
+//3) The hidden property on a node controls whether it is rendered or not. If the remainder calculated above is in the second half of the slice, it should be hidden (invisible). Otherwise it will be visible. Hence, the blink effect!
+//
+//Note that you can also accomplish a blink effect with a combination of hide() and unhide() actions, as you see in HideScene.
+//
+//*/
 
 
 
