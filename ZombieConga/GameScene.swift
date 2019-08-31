@@ -32,6 +32,8 @@ GAME CONSTANTS
         "hitCatLady.wav", waitForCompletion: false)
     var invincible = false //set the status of the zombie when not contacted by enemy
     let catMovePointsPerSec: CGFloat = 480.0    // keep track of move points per second
+    var lives = 5 //adding base number of lives for Zombie
+    var gameOver = false //Game over status for Scene Change
     
 /*****************************************************
 INITIALISE PLAYABLE AREA
@@ -183,6 +185,12 @@ UPDATE VIEW
         boundsCheckZombie() //call method to bounce off walls
         
         moveTrain()   // move cats train to follow you
+        
+        if lives <= 0 && !gameOver //game over status set - if not already over & lives is <= 0
+        {
+            gameOver = true
+            print("You lose!")
+        }
         
     }
     
@@ -397,7 +405,6 @@ TOUCH CONTROLS MOVEMENT
         cat.run(turnGreen)
        
         run(catCollisionSound)
-  
         
     }
     
@@ -418,6 +425,9 @@ TOUCH CONTROLS MOVEMENT
         zombie.run(SKAction.sequence([blinkAction, setHidden]))
         
         run(enemyCollisionSound)
+        
+        loseCats() // remove two cats method
+        lives -= 1 // lose a life
     }
     
     func checkCollisions()
@@ -470,14 +480,18 @@ TOUCH CONTROLS MOVEMENT
             checkCollisions()
         }
     
+    
     func moveTrain()
     {
+        var trainCount = 0 // set a train count of zero cats
         var targetPosition = zombie.position //create variable based on zombie position
         
         enumerateChildNodes(withName: "train")  // enumerate all children with the word train
+            
         {
             node, stop in
-            if !node.hasActions()    //if the node doesn't have actions (i.e all have been removed from cat)
+            trainCount += 1
+            if !node.hasActions()  //if the node doesn't have actions (i.e all have been removed from cat)
             {
                 let actionDuration = 0.3
                 let offset = targetPosition - node.position     //offset is difference between zombie and cat
@@ -490,24 +504,62 @@ TOUCH CONTROLS MOVEMENT
             targetPosition = node.position
         }
         
+        if trainCount >= 15 && !gameOver
+        {
+            gameOver = true
+            print("You win!")
+        }
+        
     }// MOVETRAIN()
+    
+
+
+/*****************************************************
+LOSE CATS WHEN HIT
+ ******************************************************/
+        
+func loseCats() {
+    // 1
+    var loseCount = 0
+    enumerateChildNodes(withName: "train") //enumerate through the conga line
+    {
+        node, stop in
+        
+        // 2  find a random offset from the cat’s current position
+        var randomSpot = node.position
+        randomSpot.x += CGFloat.random(min: -100, max: 100)
+        randomSpot.y += CGFloat.random(min: -100, max: 100)
+      
+        // 3 run a little animation to make the cat move toward the random spot, spinning around and scaling to 0 along the way. Finally, the animation removes the cat from the scene.
+        node.name = ""
+        node.run(
+            SKAction.sequence([
+                SKAction.group([
+                    SKAction.rotate(byAngle: π*4, duration: 1.0),
+                    SKAction.move(to: randomSpot, duration: 1.0),
+                    SKAction.scale(to: 0, duration: 1.0)
+                    ]),
+                SKAction.removeFromParent()
+                ]))
+        
+        // 4 update the variable that’s tracking the number of cats you’ve removed from the conga line
+        loseCount += 1
+        if loseCount >= 2 {
+            stop[0] = true
+        }
+    }
+    
+}
+    
+    
+    
+    
+    
+    
+    
     
 } //FINAL CLOSING BRACKET CLASS
 
-/*****************************************************
-CATS FOLLOW ZOMBIE IN THE TRAIN
- ******************************************************/
-        
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
 /*****************************************************
 NOTES
  ******************************************************/
