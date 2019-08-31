@@ -190,6 +190,14 @@ UPDATE VIEW
         {
             gameOver = true
             print("You lose!")
+            
+            // 1
+            let gameOverScene = GameOverScene(size: size)
+            gameOverScene.scaleMode = scaleMode
+            // 2
+            let reveal = SKTransition.flipHorizontal(withDuration: 0.5)
+            // 3
+            view?.presentScene(gameOverScene, transition: reveal)
         }
         
     }
@@ -344,12 +352,7 @@ TOUCH CONTROLS MOVEMENT
         zombie.removeAction(forKey: "animation")
     }
     
-    
 
-
-
-
-    
     
 /*****************************************************
  SCALE ACTION SPAWN CATS
@@ -508,7 +511,16 @@ TOUCH CONTROLS MOVEMENT
         {
             gameOver = true
             print("You win!")
+            // 1
+            let gameOverScene = GameOverScene(size: size)
+            gameOverScene.scaleMode = scaleMode //matches  current sacle mode in gamescene
+            // 2
+            let reveal = SKTransition.flipHorizontal(withDuration: 0.5) //transition = flip horizontal
+            // 3
+            view?.presentScene(gameOverScene, transition: reveal) // reveal transition
         }
+        
+
         
     }// MOVETRAIN()
     
