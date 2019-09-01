@@ -34,6 +34,7 @@ GAME CONSTANTS
     let catMovePointsPerSec: CGFloat = 480.0    // keep track of move points per second
     var lives = 5 //adding base number of lives for Zombie
     var gameOver = false //Game over status for Scene Change
+  
     
 /*****************************************************
 INITIALISE PLAYABLE AREA
@@ -192,7 +193,7 @@ UPDATE VIEW
             print("You lose!")
             
             // 1
-            let gameOverScene = GameOverScene(size: size)
+              let gameOverScene = GameOverScene(size: size, won: false)
             gameOverScene.scaleMode = scaleMode
             // 2
             let reveal = SKTransition.flipHorizontal(withDuration: 0.5)
@@ -512,7 +513,7 @@ TOUCH CONTROLS MOVEMENT
             gameOver = true
             print("You win!")
             // 1
-            let gameOverScene = GameOverScene(size: size)
+            let gameOverScene = GameOverScene(size: size, won: true)
             gameOverScene.scaleMode = scaleMode //matches  current sacle mode in gamescene
             // 2
             let reveal = SKTransition.flipHorizontal(withDuration: 0.5) //transition = flip horizontal
