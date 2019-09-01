@@ -117,6 +117,8 @@ BACKGROUND
         
         addChild(zombie)
         
+        playBackgroundMusic(filename: "backgroundMusic.mp3")
+        
 //        zombie.run(SKAction.repeatForever(zombieAnimation)) //Runs the animation for the zombie
     
 
@@ -199,6 +201,8 @@ UPDATE VIEW
             let reveal = SKTransition.flipHorizontal(withDuration: 0.5)
             // 3
             view?.presentScene(gameOverScene, transition: reveal)
+            
+            backgroundMusicPlayer.stop()
         }
         
     }
@@ -519,6 +523,8 @@ TOUCH CONTROLS MOVEMENT
             let reveal = SKTransition.flipHorizontal(withDuration: 0.5) //transition = flip horizontal
             // 3
             view?.presentScene(gameOverScene, transition: reveal) // reveal transition
+            
+            backgroundMusicPlayer.stop()
         }
         
 
