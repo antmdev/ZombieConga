@@ -55,6 +55,7 @@ GAME CONSTANTS
     //Font Constants
     // let livesLabel = SKLabelNode(fontNamed: "Chalkduster") //set font for lives
     let livesLabel = SKLabelNode(fontNamed: "Glimstick")
+    let catsLabel = SKLabelNode(fontNamed: "Glimstick")
     
 /*****************************************************
 INITIALISE PLAYABLE AREA
@@ -179,7 +180,7 @@ BACKGROUND
     camera = cameraNode //label as camera
     cameraNode.position = CGPoint(x: size.width/2, y: size.height/2) //make it center the screen
         
-    //ADDING FONTS TO SCENE
+    //ADDING FONTS TO SCENE LIVES
     livesLabel.text = "Lives: X"
     livesLabel.fontColor = SKColor.black
     livesLabel.fontSize = 100
@@ -190,6 +191,18 @@ BACKGROUND
         x: -playableRect.size.width/2 + CGFloat(20), //buffer off edge of screen
         y: -playableRect.size.height/2 + CGFloat(20))
     cameraNode.addChild(livesLabel)  //add as a child of the camera node to keep on screen
+     
+    //CATS LABEL
+    catsLabel.text = "Cats: X"
+    catsLabel.fontColor = SKColor.black
+    catsLabel.fontSize = 100
+    catsLabel.zPosition = 150
+    catsLabel.horizontalAlignmentMode = .right // align right & Bottom
+    catsLabel.verticalAlignmentMode = .bottom
+    catsLabel.position = CGPoint(
+        x: playableRect.size.width/2 - CGFloat(20),
+        y: -playableRect.size.height/2 + CGFloat(20))
+    cameraNode.addChild(catsLabel)  //add as a child of the camera node to keep on screen
         
         
         //NOTES ON SIZE & WIDTH
@@ -248,6 +261,9 @@ UPDATE VIEW
         
         moveTrain()   // move cats train to follow you
         moveCamera() //call move camera method
+        
+        livesLabel.text = "Lives: \(lives)" //update number of lives
+       
         
         if lives <= 0 && !gameOver //game over status set - if not already over & lives is <= 0
         {
@@ -605,7 +621,7 @@ TOUCH CONTROLS MOVEMENT
             backgroundMusicPlayer.stop()
         }
         
-
+        catsLabel.text = "Cats: \(trainCount)"
         
     }// MOVETRAIN()
     
