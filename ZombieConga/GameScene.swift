@@ -51,7 +51,10 @@ GAME CONSTANTS
             width: playableRect.width,
             height: playableRect.height)
     }
-  
+    
+    //Font Constants
+    // let livesLabel = SKLabelNode(fontNamed: "Chalkduster") //set font for lives
+    let livesLabel = SKLabelNode(fontNamed: "Glimstick")
     
 /*****************************************************
 INITIALISE PLAYABLE AREA
@@ -175,6 +178,25 @@ BACKGROUND
     addChild(cameraNode) //constant camera node declared at top
     camera = cameraNode //label as camera
     cameraNode.position = CGPoint(x: size.width/2, y: size.height/2) //make it center the screen
+        
+    //ADDING FONTS TO SCENE
+    livesLabel.text = "Lives: X"
+    livesLabel.fontColor = SKColor.black
+    livesLabel.fontSize = 100
+    livesLabel.zPosition = 150
+    livesLabel.horizontalAlignmentMode = .left // align left & Bottom
+    livesLabel.verticalAlignmentMode = .bottom
+    livesLabel.position = CGPoint(
+        x: -playableRect.size.width/2 + CGFloat(20), //buffer off edge of screen
+        y: -playableRect.size.height/2 + CGFloat(20))
+    cameraNode.addChild(livesLabel)  //add as a child of the camera node to keep on screen
+        
+        
+        //NOTES ON SIZE & WIDTH
+        
+    //x: -playableRect.size.width/2 + CGFloat(20),
+    // Here you're actually subtracting half of the width and half of the height, but you're starting in the middle
+    // of the screen - so minus half and half will take you to the bottom left corner
         
     }
     
