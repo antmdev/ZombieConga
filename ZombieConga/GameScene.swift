@@ -83,17 +83,17 @@ INITIALISE PLAYABLE AREA
     // 6 Whenever you override the default initializer of a SpriteKit node, you must also override the required NSCoder initializer, which is used when you’re loading a scene from the scene editor. Since you’re not using the scene editor in this game, you simply add a placeholder implementation that logs an error.
     }
     
-    func debugDrawPlayableArea() // add a helper method to draw this playable rectangle to the screen:
-    {
-        let shape = SKShapeNode()
-        let path = CGMutablePath()
-        path.addRect(playableRect)
-        shape.path = path
-        shape.strokeColor = SKColor.red
-        shape.lineWidth = 4.0
-        addChild(shape)
-    }
-        
+////    func debugDrawPlayableArea() // add a helper method to draw this playable rectangle to the screen:
+//    {
+//        let shape = SKShapeNode()
+//        let path = CGMutablePath()
+//        path.addRect(playableRect)
+//        shape.path = path
+//        shape.strokeColor = SKColor.red
+//        shape.lineWidth = 4.0
+//        addChild(shape)
+//    }
+    
 /*****************************************************
 BACKGROUND
  ******************************************************/
@@ -140,7 +140,7 @@ BACKGROUND
             },
                 SKAction.wait(forDuration: 1.0)])))
         
-        debugDrawPlayableArea() //call the debug playable area
+//        debugDrawPlayableArea() //call the debug playable area
         
     }
     

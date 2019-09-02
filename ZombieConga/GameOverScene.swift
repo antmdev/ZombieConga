@@ -61,7 +61,7 @@ override func didMove(to view: SKView)
     let wait = SKAction.wait(forDuration: 3.0)
     let block = SKAction.run
     {
-        let myScene = GameScene(size: self.size)
+        let myScene = MainMenuScene(size: self.size)  //reset to main menu scene before starting (change to gamescene to jump back into gam directly)
         myScene.scaleMode = self.scaleMode
         let reveal = SKTransition.flipHorizontal(withDuration: 0.5)
         self.view?.presentScene(myScene, transition: reveal)
