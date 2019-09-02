@@ -34,6 +34,23 @@ GAME CONSTANTS
     let catMovePointsPerSec: CGFloat = 480.0    // keep track of move points per second
     var lives = 5 //adding base number of lives for Zombie
     var gameOver = false //Game over status for Scene Change
+    
+    //Camera constants
+    let cameraNode = SKCameraNode() //Create the camera node
+    let cameraMovePointsPerSec: CGFloat = 200.0 //sets the camera scroll speed
+    
+    var cameraRect : CGRect //helper method that calculates the current “visible playable area”.
+    {
+        let x = cameraNode.position.x - size.width/2
+            + (size.width - playableRect.width)/2
+        let y = cameraNode.position.y - size.height/2
+            + (size.height - playableRect.height)/2
+        return CGRect(
+            x: x,
+            y: y,
+            width: playableRect.width,
+            height: playableRect.height)
+    }
   
     
 /*****************************************************
@@ -101,15 +118,29 @@ BACKGROUND
     override func didMove(to view: SKView)
     {
         backgroundColor = SKColor.black
-        let background = SKSpriteNode(imageNamed: "background1")
-        background.anchorPoint = CGPoint(x: 0.5, y: 0.5) //default
-        background.position = CGPoint(x: size.width/2, y: size.height/2)
-        background.zPosition = -1 //ensure background is behind all sprites
-        addChild(background)
+        //OLD STATIC BACKGROUND
+//        let background = SKSpriteNode(imageNamed: "background1") // OLD
+//        background.anchorPoint = CGPoint(x: 0.5, y: 0.5) //default
+//        background.position = CGPoint(x: size.width/2, y: size.height/2)
+//        background.zPosition = -1 //ensure background is behind all sprites
+//        addChild(background)
         
-        let mySize = background.size
-        print("Size: \(mySize)")
+        //NEW BACKGROUND
+        //runs a for loop which creates two copies of the background and then sets
+        // their positions, so the second copy begins after the first ends.
+
+        for i in 0...1
+        {
+            let background = backgroundNode()
+            background.anchorPoint = CGPoint.zero
+            background.position =
+                CGPoint(x: CGFloat(i)*background.size.width, y: 0)
+            background.name = "background"
+            addChild(background)
+        }
         
+//        let mySize = background.size //get and print the background size
+//        print("Size: \(mySize)")
         
 // SPRITE ZOMBIE
         zombie.position = CGPoint(x:400, y: 400)
@@ -120,8 +151,6 @@ BACKGROUND
         playBackgroundMusic(filename: "backgroundMusic.mp3")
         
 //        zombie.run(SKAction.repeatForever(zombieAnimation)) //Runs the animation for the zombie
-    
-
 // SPRITE ENEMY SEQUENCE RUN
         //New SPawn enemy in randomised locatin function
         //create a sequence of calling spawnEnemy() and waiting two seconds, and repeat this sequence forever.
@@ -141,6 +170,11 @@ BACKGROUND
                 SKAction.wait(forDuration: 1.0)])))
         
 //        debugDrawPlayableArea() //call the debug playable area
+        
+    //ADD THE CAMERA
+    addChild(cameraNode) //constant camera node declared at top
+    camera = cameraNode //label as camera
+    cameraNode.position = CGPoint(x: size.width/2, y: size.height/2) //make it center the screen
         
     }
     
@@ -168,22 +202,25 @@ UPDATE VIEW
 //        move(sprite: zombie, velocity: CGPoint(x: zombieMovePointsPerSec, y: 0))
         
 //ADDING A SETTING TO STOP THE ZOMBIE FROM MOVING AFTER CLICKING
+        //REMOVE CODE SO ZOMBIE ALWASY RUNS ON HIS OWN
         
-        if let lastTouchLocation = lastTouchLocation
-        {
-            let diff = lastTouchLocation - zombie.position
-            if diff.length() <= zombieMovePointsPerSec * CGFloat(dt)
-            {
-                zombie.position = lastTouchLocation
-                velocity = CGPoint.zero
-                stopZombieAnimation() //STOPS zombie animation after movement
-
-            } else
-            {
+//        if let lastTouchLocation = lastTouchLocation
+//        {
+//            let diff = lastTouchLocation - zombie.position
+//            if diff.length() <= zombieMovePointsPerSec * CGFloat(dt)
+//            {
+//                zombie.position = lastTouchLocation
+//                velocity = CGPoint.zero
+//                stopZombieAnimation() //STOPS zombie animation after movement
+//
+//            } else
+//            {
+        //SET ZOMBIE FREE -- continuous running
                 move(sprite: zombie, velocity: velocity)
                 rotate(sprite: zombie, direction: velocity, rotateRadiansPerSec: zombieRotateRadiansPerSec)
-            }
-        }
+//            }
+//        }
+
         
         boundsCheckZombie() //call method to bounce off walls
         
@@ -204,6 +241,10 @@ UPDATE VIEW
             
             backgroundMusicPlayer.stop()
         }
+      
+//        cameraNode.position = zombie.position //CAMERA WILL FOLLOW ZOMBIE!!!!
+        
+        moveCamera() //call move camera method
         
     }
     
@@ -279,14 +320,20 @@ TOUCH CONTROLS MOVEMENT
     func boundsCheckZombie()
     {
         // make constants for the bottom-left and top-right coordinates of the scene.
-        let bottomLeft = CGPoint(x: 0, y: playableRect.minY)
-        let topRight = CGPoint(x: size.width, y: playableRect.maxY)
+    //OLD - ASSUMES SCREEN IS ALWAYS IN CONSTANT POSITION
+//        let bottomLeft = CGPoint(x: 0, y: playableRect.minY)
+//        let topRight = CGPoint(x: size.width, y: playableRect.maxY)
+        
+        //NEW - NOW KEEPS ZOMBIE IN CAMERA VISABLE AREA
+        let bottomLeft = CGPoint(x: cameraRect.minX, y: cameraRect.minY)
+        let topRight = CGPoint(x: cameraRect.maxX, y: cameraRect.maxY)
         
         // Then, you check the zombie’s position to see if it’s beyond or on any of the screen edges. If it is, you clamp the position and reverse the appropriate velocity component to make the zombie bounce in the opposite direction.
         if zombie.position.x <= bottomLeft.x
-        {
+        
+        {//ensure that whenever the zombie reaches the left boundary, his x-velocity will stay pointed toward the right.
             zombie.position.x = bottomLeft.x
-            velocity.x = -velocity.x
+            velocity.x = abs(velocity.x)
         }
         if zombie.position.x >= topRight.x
         {
@@ -326,6 +373,7 @@ TOUCH CONTROLS MOVEMENT
             y: CGFloat.random(
                 min: playableRect.minY + enemy.size.height/2,
                 max: playableRect.maxY - enemy.size.height/2))
+        
         addChild(enemy)
         
         let actionMove = SKAction.moveTo(x: -enemy.size.width/2, duration: 2.0)
@@ -366,11 +414,16 @@ TOUCH CONTROLS MOVEMENT
     {
         let cat = SKSpriteNode(imageNamed: "cat")
         cat.name = "cat" //name cat for collisions
-        
+//      CAT SPAWNS IN POSITION BEFORE BACGROUND WAS SCROLLING
+//        cat.position = CGPoint(
+//            x:CGFloat.random(min: playableRect.minX, max: playableRect.maxX),
+//            y:CGFloat.random(min: playableRect.minY, max: playableRect.maxY)
+//        )
+   //Spawn cat in visible area of the screen in screen
         cat.position = CGPoint(
-            x:CGFloat.random(min: playableRect.minX, max: playableRect.maxX),
-            y:CGFloat.random(min: playableRect.minY, max: playableRect.maxY)
-        )
+            x: CGFloat.random(min: cameraRect.minX, max: cameraRect.maxX),
+            y: CGFloat.random(min: cameraRect.minY, max: cameraRect.maxY))
+        cat.zPosition = 50
         cat.setScale(0) //start scale at 0
         addChild(cat)
         
@@ -570,7 +623,66 @@ func loseCats() {
     
 }
     
+
+/*****************************************************
+COMBINE SCENES FOR SCROLLING BACKGROUND
+ ******************************************************/
+
+func backgroundNode() -> SKSpriteNode
+{
+    // 1 create a new SKNode to contain both background sprites as children.
+    // use an SKSpriteNode with no texture
+    let backgroundNode = SKSpriteNode()
+    backgroundNode.anchorPoint = CGPoint.zero
+    backgroundNode.name = "background"
     
+    // 2 create an SKSpriteNode for the first background image and pin the bottom- left
+    // of the sprite to the bottom-left of backgroundNode
+    let background1 = SKSpriteNode(imageNamed: "background1")
+    background1.anchorPoint = CGPoint.zero
+    background1.position = CGPoint(x: 0, y: 0)
+    backgroundNode.addChild(background1)
+    
+    // 3 create an SKSpriteNode for the second background image and pin the bottom-left
+    // of the sprite to the bottom-right of background1 inside backgroundNode.
+    let background2 = SKSpriteNode(imageNamed: "background2")
+    background2.anchorPoint = CGPoint.zero
+    background2.position = CGPoint(x: background1.size.width, y: 0)
+    backgroundNode.addChild(background2)
+    
+    // 4 set the size of the backgroundNode based on the size of the two background images.
+    backgroundNode.size = CGSize(
+        width: background1.size.width + background2.size.width,
+        height: background1.size.height)
+    return backgroundNode
+}
+    // calculates the amount the camera should move this frame, and updates the
+    //camera’s position accordingly.
+
+    func moveCamera()
+    {
+        let backgroundVelocity = CGPoint(x: cameraMovePointsPerSec, y: 0)
+        let amountToMove = backgroundVelocity * CGFloat(dt)
+        cameraNode.position += amountToMove
+        
+    //For each of the two background nodes, you check to see if the right-hand side of
+    //the background is less than the left-hand side of the current visible playable area — in other words, if it’s offscreen.
+    //If the background is completely offscreen, you simply move the background node to the right
+    //by double the width of the background. Since there are two background nodes,
+    //this places the offscreen node immediately to the right of the other, onscreen node.
+        enumerateChildNodes(withName: "background")
+        {
+            node, _ in
+            let background = node as! SKSpriteNode
+            if background.position.x + background.size.width <
+                self.cameraRect.origin.x
+            {
+                background.position = CGPoint(
+                    x: background.position.x + background.size.width*2,
+                    y: background.position.y)
+            }
+        }
+    }
     
     
     
