@@ -225,26 +225,23 @@ UPDATE VIEW
         boundsCheckZombie() //call method to bounce off walls
         
         moveTrain()   // move cats train to follow you
+        moveCamera() //call move camera method
         
         if lives <= 0 && !gameOver //game over status set - if not already over & lives is <= 0
         {
             gameOver = true
             print("You lose!")
-            
             // 1
-              let gameOverScene = GameOverScene(size: size, won: false)
+            let gameOverScene = GameOverScene(size: size, won: false)
             gameOverScene.scaleMode = scaleMode
             // 2
             let reveal = SKTransition.flipHorizontal(withDuration: 0.5)
             // 3
             view?.presentScene(gameOverScene, transition: reveal)
-            
             backgroundMusicPlayer.stop()
         }
       
-//        cameraNode.position = zombie.position //CAMERA WILL FOLLOW ZOMBIE!!!!
-        
-        moveCamera() //call move camera method
+//        cameraNode.position = zombie.position //CAMERA WILL FOLLOW ZOMBIE!!!
         
     }
     
@@ -259,8 +256,8 @@ SPRITE MOVEMENT
     
     func move(sprite: SKSpriteNode, velocity: CGPoint)
     {
-        let amountToMove = velocity * CGFloat(dt)
-//        print("Amount to move: \(amountToMove)")
+        let amountToMove = CGPoint(x: velocity.x * CGFloat(dt),
+                                   y: velocity.y * CGFloat(dt))
         sprite.position += amountToMove
     }
  
@@ -368,22 +365,24 @@ TOUCH CONTROLS MOVEMENT
     {
         let enemy = SKSpriteNode(imageNamed: "enemy")
         enemy.position = CGPoint(
-            x: size.width + enemy.size.width/2,
+            x: cameraRect.maxX + enemy.size.width/2,
             //modified the fixed y-position to be a random value between the bottom and top of the playable rectangle
             y: CGFloat.random(
-                min: playableRect.minY + enemy.size.height/2,
-                max: playableRect.maxY - enemy.size.height/2))
-        
+                min: cameraRect.minY + enemy.size.height/2,
+                max: cameraRect.maxY - enemy.size.height/2))
+        enemy.zPosition = 50
+        enemy.name = "enemy" // set name for enemys for collision
         addChild(enemy)
         
-        let actionMove = SKAction.moveTo(x: -enemy.size.width/2, duration: 2.0)
+//        let actionMove = SKAction.moveTo(x: -enemy.size.width/2, duration: 2.0)
+        //add code to stop spawning enemies and doubling in speed each time they respawn
+        // take out the refference to enemy so it only takes into account screen size
+        let actionMove = SKAction.moveBy(x: -(size.width + enemy.size.width), y: 0, duration: 2.0)
       
         //REMOVE NODES ONCE THEY'RE NOT REQUIRED
         let actionRemove = SKAction.removeFromParent()
         //RUN SEQUENCE
         enemy.run(SKAction.sequence([actionMove, actionRemove]))
-        
-        enemy.name = "enemy" // set name for enemys for collision
     }
   
 /*****************************************************
@@ -473,13 +472,17 @@ TOUCH CONTROLS MOVEMENT
         invincible = true
         let blinkTimes = 10.0
         let duration = 3.0
-        let blinkAction = SKAction.customAction(withDuration: duration) { node, elapsedTime in
+        let blinkAction = SKAction.customAction(withDuration: duration)
+        {
+            node, elapsedTime in
             let slice = duration / blinkTimes
             let remainder = Double(elapsedTime).truncatingRemainder(
                 dividingBy: slice)
             node.isHidden = remainder > slice / 2
         }
-        let setHidden = SKAction.run() { [weak self] in
+        let setHidden = SKAction.run()
+        {
+            [weak self] in
             self?.zombie.isHidden = false
             self?.invincible = false
         }
