@@ -14,13 +14,14 @@ class GameViewController: UIViewController
     override func viewDidLoad()
     {
         super.viewDidLoad()
-        let scene =
-            MainMenuScene(size:CGSize (width: 2048, height: 1536))
+        let scene = GameScene(size:CGSize (width: 2048, height: 1536))
+     //   let scene = MainMenuScene(size:CGSize (width: 2688, height: 1242)) //iphone xs max
         let skView = self.view as! SKView
         skView.showsFPS = true
         skView.showsNodeCount = true
         skView.ignoresSiblingOrder = true
         scene.scaleMode = .aspectFill
+//        scene.scaleMode = .resizeFill //might help on iphone XS MAX
         skView.presentScene(scene)
     }
     

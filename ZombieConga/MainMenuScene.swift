@@ -10,7 +10,10 @@ class MainMenuScene: SKScene
     override func didMove(to view: SKView)
     {
         let background = SKSpriteNode(imageNamed: "MainMenu")
+        
         background.position = CGPoint(x: size.width/2, y: size.height/2)
+//        background.anchorPoint = CGPoint.zero
+//        background.position = CGPoint(x: background.size.width, y: 0)
         addChild(background)
     }
     
@@ -20,7 +23,7 @@ class MainMenuScene: SKScene
     
     func sceneTapped()
     {
-        let myScene = GameScene(size: size)
+        let myScene = GameScene(size: size) // ipone
         myScene.scaleMode = scaleMode
         let reveal = SKTransition.doorway(withDuration: 1.5)
         view?.presentScene(myScene, transition: reveal)

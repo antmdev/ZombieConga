@@ -33,6 +33,7 @@ GAME CONSTANTS
     var invincible = false //set the status of the zombie when not contacted by enemy
     let catMovePointsPerSec: CGFloat = 480.0    // keep track of move points per second
     var lives = 5 //adding base number of lives for Zombie
+    var trainCount = 0 //setting variable for number of cats
     var gameOver = false //Game over status for Scene Change
     
     //Camera constants
@@ -589,7 +590,6 @@ TOUCH CONTROLS MOVEMENT
         var targetPosition = zombie.position //create variable based on zombie position
         
         enumerateChildNodes(withName: "train")  // enumerate all children with the word train
-            
         {
             node, stop in
             trainCount += 1
@@ -621,7 +621,8 @@ TOUCH CONTROLS MOVEMENT
             backgroundMusicPlayer.stop()
         }
         
-        catsLabel.text = "Cats: \(trainCount)"
+         catsLabel.text = "Cats: \(trainCount)/15" //update number of Cats
+
         
     }// MOVETRAIN()
     
