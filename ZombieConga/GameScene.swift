@@ -79,25 +79,18 @@ INITIALISE PLAYABLE AREA
 ///////////////////////////////
 // ZOMBIE ANIMATION ACTION!!!
 ///////////////////////////////
+        
         // 1 create an array that will store all of the textures to run in the animation.
-        
         var textures:[SKTexture] = []
-        
         // 2 loop that creates a string for each image name and then makes a texture object from each name using the SKTexture(imageNamed:) initializer.
-        
         for i in 1...4 {
             textures.append(SKTexture(imageNamed: "zombie\(i)"))
         }
-        
         // 3 frames 3 and 2 to the list
-        
         textures.append(textures[2])
         textures.append(textures[1])
-        
         // 4 create and run an action with animate
-        
-        zombieAnimation = SKAction.animate(with: textures,
-                                           timePerFrame: 0.1)
+        zombieAnimation = SKAction.animate(with: textures, timePerFrame: 0.1)
         
         super.init(size: size) // 5 You call the initializer of the superclass.
     }
@@ -105,19 +98,7 @@ INITIALISE PLAYABLE AREA
     required init(coder aDecoder: NSCoder)
     {
         fatalError("init(coder:) has not been implemented")
-    // 6 Whenever you override the default initializer of a SpriteKit node, you must also override the required NSCoder initializer, which is used when you’re loading a scene from the scene editor. Since you’re not using the scene editor in this game, you simply add a placeholder implementation that logs an error.
     }
-    
-////    func debugDrawPlayableArea() // add a helper method to draw this playable rectangle to the screen:
-//    {
-//        let shape = SKShapeNode()
-//        let path = CGMutablePath()
-//        path.addRect(playableRect)
-//        shape.path = path
-//        shape.strokeColor = SKColor.red
-//        shape.lineWidth = 4.0
-//        addChild(shape)
-//    }
     
 /*****************************************************
 BACKGROUND
@@ -126,16 +107,6 @@ BACKGROUND
     override func didMove(to view: SKView)
     {
         backgroundColor = SKColor.black
-        //OLD STATIC BACKGROUND
-//        let background = SKSpriteNode(imageNamed: "background1") // OLD
-//        background.anchorPoint = CGPoint(x: 0.5, y: 0.5) //default
-//        background.position = CGPoint(x: size.width/2, y: size.height/2)
-//        background.zPosition = -1 //ensure background is behind all sprites
-//        addChild(background)
-        
-        //NEW BACKGROUND
-        //runs a for loop which creates two copies of the background and then sets
-        // their positions, so the second copy begins after the first ends.
 
         for i in 0...1
         {
@@ -147,82 +118,60 @@ BACKGROUND
             addChild(background)
         }
         
-//        let mySize = background.size //get and print the background size
-//        print("Size: \(mySize)")
-        
 // SPRITE ZOMBIE
         zombie.position = CGPoint(x:400, y: 400)
         zombie.zPosition = 100 // so he stays above the cats!
-        
         addChild(zombie)
-        
         playBackgroundMusic(filename: "backgroundMusic.mp3")
-        
-//        zombie.run(SKAction.repeatForever(zombieAnimation)) //Runs the animation for the zombie
-// SPRITE ENEMY SEQUENCE RUN
-        //New SPawn enemy in randomised locatin function
-        //create a sequence of calling spawnEnemy() and waiting two seconds, and repeat this sequence forever.
-        //Note: You are using a weak reference to self here. Otherwise the closure passed to run(_ block:) will create a strong reference cycle and result in a memory leak.
-        
+        // SPRITE CATS SEQUENCE RUN
         run(SKAction.repeatForever(SKAction.sequence([SKAction.run()
             {
                 [weak self] in self?.spawnEnemy()
             },
                 SKAction.wait(forDuration: 2.0)])))
         
-// SPRITE CATS SEQUENCE RUN
+        // SPRITE CATS SEQUENCE RUN
         run(SKAction.repeatForever(SKAction.sequence([SKAction.run()
             {
                 [weak self] in self?.spawnCat()
             },
                 SKAction.wait(forDuration: 1.0)])))
         
-// SPAWN LIVES
+        // SPAWN LIVES
         run(SKAction.repeatForever(SKAction.sequence([SKAction.run()
             {
                 [weak self] in self?.spawnLife()
             },
                 SKAction.wait(forDuration: 10.0)])))
         
-//        debugDrawPlayableArea() //call the debug playable area
+        //ADD THE CAMERA
+        addChild(cameraNode) //constant camera node declared at top
+        camera = cameraNode //label as camera
+        cameraNode.position = CGPoint(x: size.width/2, y: size.height/2) //make it center the screen
         
-    //ADD THE CAMERA
-    addChild(cameraNode) //constant camera node declared at top
-    camera = cameraNode //label as camera
-    cameraNode.position = CGPoint(x: size.width/2, y: size.height/2) //make it center the screen
+        //ADDING FONTS TO SCENE LIVES
+        livesLabel.text = "Lives: X"
+        livesLabel.fontColor = SKColor.black
+        livesLabel.fontSize = 100
+        livesLabel.zPosition = 150
+        livesLabel.horizontalAlignmentMode = .left // align left & Bottom
+        livesLabel.verticalAlignmentMode = .bottom
+        livesLabel.position = CGPoint(
+            x: -playableRect.size.width/2 + CGFloat(20), //buffer off edge of screen
+            y: -playableRect.size.height/2 + CGFloat(20))
+        cameraNode.addChild(livesLabel)  //add as a child of the camera node to keep on screen
         
-    //ADDING FONTS TO SCENE LIVES
-    livesLabel.text = "Lives: X"
-    livesLabel.fontColor = SKColor.black
-    livesLabel.fontSize = 100
-    livesLabel.zPosition = 150
-    livesLabel.horizontalAlignmentMode = .left // align left & Bottom
-    livesLabel.verticalAlignmentMode = .bottom
-    livesLabel.position = CGPoint(
-        x: -playableRect.size.width/2 + CGFloat(20), //buffer off edge of screen
-        y: -playableRect.size.height/2 + CGFloat(20))
-    cameraNode.addChild(livesLabel)  //add as a child of the camera node to keep on screen
-     
-    //CATS LABEL
-    catsLabel.text = "Cats: X"
-    catsLabel.fontColor = SKColor.black
-    catsLabel.fontSize = 100
-    catsLabel.zPosition = 150
-    catsLabel.horizontalAlignmentMode = .right // align right & Bottom
-    catsLabel.verticalAlignmentMode = .bottom
-    catsLabel.position = CGPoint(
-        x: playableRect.size.width/2 - CGFloat(20),
-        y: -playableRect.size.height/2 + CGFloat(20))
-    cameraNode.addChild(catsLabel)  //add as a child of the camera node to keep on screen
-        
-
-        
-        
-        //NOTES ON SIZE & WIDTH
-        
-    //x: -playableRect.size.width/2 + CGFloat(20),
-    // Here you're actually subtracting half of the width and half of the height, but you're starting in the middle
-    // of the screen - so minus half and half will take you to the bottom left corner
+        //CATS LABEL
+        catsLabel.text = "Cats: X"
+        catsLabel.fontColor = SKColor.black
+        catsLabel.fontSize = 100
+        catsLabel.zPosition = 150
+        catsLabel.horizontalAlignmentMode = .right // align right & Bottom
+        catsLabel.verticalAlignmentMode = .bottom
+        catsLabel.position = CGPoint(
+            x: playableRect.size.width/2 - CGFloat(20),
+            y: -playableRect.size.height/2 + CGFloat(20))
+        cameraNode.addChild(catsLabel)  //add as a child of the camera node to keep on screen
         
     }
     
@@ -243,31 +192,13 @@ UPDATE VIEW
         }
         
         lastUpdateTime = currentTime
-//        print("\(dt*1000) milliseconds since last update")
 
-// passes in velocity (updated based on the touch)
         move(sprite: zombie, velocity: velocity)
-//        move(sprite: zombie, velocity: CGPoint(x: zombieMovePointsPerSec, y: 0))
         
-//ADDING A SETTING TO STOP THE ZOMBIE FROM MOVING AFTER CLICKING
-        //REMOVE CODE SO ZOMBIE ALWASY RUNS ON HIS OWN
-        
-//        if let lastTouchLocation = lastTouchLocation
-//        {
-//            let diff = lastTouchLocation - zombie.position
-//            if diff.length() <= zombieMovePointsPerSec * CGFloat(dt)
-//            {
-//                zombie.position = lastTouchLocation
-//                velocity = CGPoint.zero
-//                stopZombieAnimation() //STOPS zombie animation after movement
-//
-//            } else
-//            {
-        //SET ZOMBIE FREE -- continuous running
-                move(sprite: zombie, velocity: velocity)
-                rotate(sprite: zombie, direction: velocity, rotateRadiansPerSec: zombieRotateRadiansPerSec)
-//            }
-//        }
+
+        move(sprite: zombie, velocity: velocity)
+        rotate(sprite: zombie, direction: velocity, rotateRadiansPerSec: zombieRotateRadiansPerSec)
+
 
         
         boundsCheckZombie() //call method to bounce off walls
@@ -291,20 +222,14 @@ UPDATE VIEW
             view?.presentScene(gameOverScene, transition: reveal)
             backgroundMusicPlayer.stop()
         }
-      
-//        cameraNode.position = zombie.position //CAMERA WILL FOLLOW ZOMBIE!!!
         
     }
-    
-   
-
     
 /*****************************************************
 SPRITE MOVEMENT
 ******************************************************/
     
 //    NEW CODE USING MATHS LIBRARY
-    
     func move(sprite: SKSpriteNode, velocity: CGPoint)
     {
         let amountToMove = CGPoint(x: velocity.x * CGFloat(dt),
@@ -327,7 +252,6 @@ TOUCH CONTROLS MOVEMENT
 ******************************************************/
     
 //    This will update the zombie’s velocity direction so that it points wherever the user taps the screen.
-    
     func sceneTouched(touchLocation:CGPoint)
     {
         lastTouchLocation = touchLocation //stopping zombie
@@ -338,14 +262,11 @@ TOUCH CONTROLS MOVEMENT
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?)
     {
         guard let touch = touches.first
-        
         else
         {
             return
         }
-        
         let touchLocation = touch.location(in: self)
-        
         sceneTouched(touchLocation: touchLocation)
     }
     
@@ -353,26 +274,17 @@ TOUCH CONTROLS MOVEMENT
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?)
     {
         guard let touch = touches.first
-            
         else
         {
             return
         }
-        
         let touchLocation = touch.location(in: self)
-        
         sceneTouched(touchLocation: touchLocation)
     }
     
     // CALCULATE ZOMBIE POSITION RELATIVE TO EDGE TO LET HIM BOUNCE OFF WALLS
     func boundsCheckZombie()
     {
-        // make constants for the bottom-left and top-right coordinates of the scene.
-    //OLD - ASSUMES SCREEN IS ALWAYS IN CONSTANT POSITION
-//        let bottomLeft = CGPoint(x: 0, y: playableRect.minY)
-//        let topRight = CGPoint(x: size.width, y: playableRect.maxY)
-        
-        //NEW - NOW KEEPS ZOMBIE IN CAMERA VISABLE AREA
         let bottomLeft = CGPoint(x: cameraRect.minX, y: cameraRect.minY)
         let topRight = CGPoint(x: cameraRect.maxX, y: cameraRect.maxY)
         
@@ -399,7 +311,6 @@ TOUCH CONTROLS MOVEMENT
             velocity.y = -velocity.y
         }
     }
-
     //Rotate Zombie
     func rotate(sprite: SKSpriteNode, direction: CGPoint, rotateRadiansPerSec: CGFloat)
     {
@@ -424,10 +335,6 @@ TOUCH CONTROLS MOVEMENT
         enemy.zPosition = 50
         enemy.name = "enemy" // set name for enemys for collision
         addChild(enemy)
-        
-//        let actionMove = SKAction.moveTo(x: -enemy.size.width/2, duration: 2.0)
-        //add code to stop spawning enemies and doubling in speed each time they respawn
-        // take out the refference to enemy so it only takes into account screen size
         let actionMove = SKAction.moveBy(x: -(size.width + enemy.size.width), y: 0, duration: 2.0)
       
         //REMOVE NODES ONCE THEY'RE NOT REQUIRED
@@ -464,11 +371,6 @@ TOUCH CONTROLS MOVEMENT
     {
         let cat = SKSpriteNode(imageNamed: "cat")
         cat.name = "cat" //name cat for collisions
-//      CAT SPAWNS IN POSITION BEFORE BACGROUND WAS SCROLLING
-//        cat.position = CGPoint(
-//            x:CGFloat.random(min: playableRect.minX, max: playableRect.maxX),
-//            y:CGFloat.random(min: playableRect.minY, max: playableRect.maxY)
-//        )
    //Spawn cat in visible area of the screen in screen
         cat.position = CGPoint(
             x: CGFloat.random(min: cameraRect.minX, max: cameraRect.maxX),
@@ -552,10 +454,9 @@ SPAWN EXTRA LIFE
         cat.removeAllActions()
         cat.setScale(1.0)
         cat.zRotation = 0
-        
+    
         let turnGreen = SKAction.colorize(with: SKColor.green, colorBlendFactor: 1.0, duration: 0.2)
         cat.run(turnGreen)
-       
         run(catCollisionSound)
         
     }
@@ -585,6 +486,7 @@ SPAWN EXTRA LIFE
         
         loseCats() // remove two cats method
         lives -= 1 // lose a life
+        
     }
     
 //PICKED UP EXTRA LIFE
@@ -612,10 +514,9 @@ SPAWN EXTRA LIFE
         for cat in hitCats
         {
             zombieHit(cat: cat)
-            
         }
-        
-        if invincible {
+        if invincible
+        {
             return
         }
         
@@ -657,18 +558,18 @@ SPAWN EXTRA LIFE
         {
             zombieHit(bonusLife: life)
         }
-    }
+   
+    } //END check collisions
         
-        override func didEvaluateActions() { //speeds up frame rate
+    override func didEvaluateActions()
+    { //speeds up frame rate
             checkCollisions()
-        }
-    
+    }
     
     func moveTrain()
     {
         var trainCount = 0 // set a train count of zero cats
         var targetPosition = zombie.position //create variable based on zombie position
-        
         enumerateChildNodes(withName: "train")  // enumerate all children with the word train
         {
             node, stop in
@@ -689,64 +590,49 @@ SPAWN EXTRA LIFE
         if trainCount >= 15 && !gameOver
         {
             gameOver = true
-            
             print("You win!")
-            
-            // 1
             let gameOverScene = GameOverScene(size: size, won: true)
             gameOverScene.scaleMode = scaleMode //matches  current sacle mode in gamescene
-            // 2
             let reveal = SKTransition.flipHorizontal(withDuration: 0.5) //transition = flip horizontal
-           
-            // 3
             view?.presentScene(gameOverScene, transition: reveal) // reveal transition
-            
             backgroundMusicPlayer.stop()
         }
-        
          catsLabel.text = "Cats: \(trainCount)/15" //update number of Cats
-
-        
     }// MOVETRAIN()
     
-
-
 /*****************************************************
 LOSE CATS WHEN HIT
  ******************************************************/
         
-func loseCats() {
-    // 1
-    var loseCount = 0
-    enumerateChildNodes(withName: "train") //enumerate through the conga line
-    {
-        node, stop in
-        
-        // 2  find a random offset from the cat’s current position
-        var randomSpot = node.position
-        randomSpot.x += CGFloat.random(min: -100, max: 100)
-        randomSpot.y += CGFloat.random(min: -100, max: 100)
-      
-        // 3 run a little animation to make the cat move toward the random spot, spinning around and scaling to 0 along the way. Finally, the animation removes the cat from the scene.
-        node.name = ""
-        node.run(
-            SKAction.sequence([
-                SKAction.group([
-                    SKAction.rotate(byAngle: π*4, duration: 1.0),
-                    SKAction.move(to: randomSpot, duration: 1.0),
-                    SKAction.scale(to: 0, duration: 1.0)
-                    ]),
-                SKAction.removeFromParent()
-                ]))
-        
-        // 4 update the variable that’s tracking the number of cats you’ve removed from the conga line
-        loseCount += 1
-        if loseCount >= 2 {
-            stop[0] = true
+    func loseCats() {
+        // 1
+        var loseCount = 0
+        enumerateChildNodes(withName: "train") //enumerate through the conga line
+        {
+            node, stop in
+            // 2  find a random offset from the cat’s current position
+            var randomSpot = node.position
+            randomSpot.x += CGFloat.random(min: -100, max: 100)
+            randomSpot.y += CGFloat.random(min: -100, max: 100)
+            // 3 run a little animation to make the cat move toward the random spot, spinning around and scaling to 0 along the way. Finally, the animation removes the cat from the scene.
+            node.name = ""
+            node.run(
+                SKAction.sequence([
+                    SKAction.group([
+                        SKAction.rotate(byAngle: π*4, duration: 1.0),
+                        SKAction.move(to: randomSpot, duration: 1.0),
+                        SKAction.scale(to: 0, duration: 1.0)
+                        ]),
+                    SKAction.removeFromParent()
+                    ]))
+            // 4 update the variable that’s tracking the number of cats you’ve removed from the conga line
+            loseCount += 1
+            if loseCount >= 2 {
+                stop[0] = true
+            }
         }
+        
     }
-    
-}
     
 
 /*****************************************************
@@ -789,12 +675,7 @@ func backgroundNode() -> SKSpriteNode
         let backgroundVelocity = CGPoint(x: cameraMovePointsPerSec, y: 0)
         let amountToMove = backgroundVelocity * CGFloat(dt)
         cameraNode.position += amountToMove
-        
-    //For each of the two background nodes, you check to see if the right-hand side of
-    //the background is less than the left-hand side of the current visible playable area — in other words, if it’s offscreen.
-    //If the background is completely offscreen, you simply move the background node to the right
-    //by double the width of the background. Since there are two background nodes,
-    //this places the offscreen node immediately to the right of the other, onscreen node.
+    
         enumerateChildNodes(withName: "background")
         {
             node, _ in
@@ -809,135 +690,5 @@ func backgroundNode() -> SKSpriteNode
         }
     }
     
-    
-    
-    
-    
-    
 } //FINAL CLOSING BRACKET CLASS
-
-/*****************************************************
-NOTES
- ******************************************************/
-
-//BACKGROUND
-//        background.position = CGPoint(x: size.width/2, y: size.height/2)
-//        background.anchorPoint = CGPoint.zero
-//        background.zRotation = CGFloat.pi / 8
-    
-//SPRITE
-//        zombie.anchorPoint = CGPoint(x: 0.5, y: 0.5)
-//        zombie1.setScale(2) // SKNode method
-
-    
-//    OLD - SPrite movement
-
-//    func move(sprite: SKSpriteNode, velocity: CGPoint)
-//    {
-//        let amountToMove = CGPoint(x: velocity.x * CGFloat(dt),
-//                                   y: velocity.y * CGFloat(dt))
-//        print("Amount to move: \(amountToMove)")
-//        sprite.position = CGPoint(
-//            x: sprite.position.x + amountToMove.x,
-//            y: sprite.position.y + amountToMove.y)
-//    }
-
-
-//// V SHAPED ENEMY MOVEMENT MOVE.BY VERSION
-//    let enemy = SKSpriteNode(imageNamed: "enemy")       //Select sprite
-//        enemy.position = CGPoint(x:size.width + enemy.size.width/2, y:size.height/2)  //Set starting position
-//                addChild(enemy)
-//
-//    let actionMidMove = SKAction.moveBy(
-//        x: -size.width/2-enemy.size.width/2,
-//        y: -playableRect.height/2 + enemy.size.height/2,
-//        duration: 1.0)
-//    let actionMove = SKAction.moveBy(
-//        x: -size.width/2-enemy.size.width/2,
-//        y: playableRect.height/2 - enemy.size.height/2,
-//        duration: 1.0)
-//    let wait = SKAction.wait(forDuration: 0.5)
-//    let logMessage = SKAction.run()
-//        {
-//            print("Reached bottom!")
-//        }
-//
-////Reverse the sequence
-//        let halfSequence = SKAction.sequence([actionMidMove, logMessage, wait, actionMove])
-//        let sequence = SKAction.sequence([halfSequence, halfSequence.reversed()])
-//
-//        enemy.run(sequence)
-//    }
-        
-//    //V SHAPED ENEMY MOVEMENT MOVE.TO VERSION
-//    let enemy = SKSpriteNode(imageNamed: "enemy")       //Select sprite
-//    
-//    enemy.position = CGPoint(x:size.width + enemy.size.width/2, y:size.height/2)  //Set starting position
-//    addChild(enemy)
-//    // 1
-//    let actionMidMove = SKAction.move(to: CGPoint(x: size.width/2, y: playableRect.minY + enemy.size.height/2),
-//        duration: 1.5) //Move to bottom middle screen
-//    // 2
-//    let actionMove = SKAction.move(to: CGPoint(x: -enemy.size.width/1, y: enemy.position.y),duration: 1.5) //Move to far leftr middle screen
-//    // 3
-//    let wait = SKAction.wait(forDuration: 1) //pause enemy on bottom of the screen
-//    let logMessage = SKAction.run()
-//        {
-//            print("Reached bottom!")
-//        }
-//    let sequence = SKAction.sequence([actionMidMove, logMessage, wait, actionMove])
-//    // 4
-//    enemy.run(sequence)
-//    }
-
-//    Anna
-//    reservations@orteapalace.com
-    
-//    1. Here, you create a new move action, just like you did before, except this time it represents the “mid-point” of the action — the bottom middle of the playable rectangle.
-//    2. This is the same move action as before, except you’ve decreased the duration to 1.0, since it will now represent moving only half the distance: from the bottom of the “V”, to the left side of the screen.
-//    3. Here’s the new sequence action! As you can see, it’s incredibly simple — you use the sequence(_:) constructor and pass in an Array of actions. The sequence action will run one action after another.
-//    4. You call run(_:) in the same way as before, but pass in the sequence action this time.
-   
-    
-//STRAIGHT LINE ENEMY MOVEMENT
-//        //position enemy just outside RHS of screen in vertical center
-//        let enemy = SKSpriteNode(imageNamed: "enemy")
-//        enemy.position = CGPoint(x:size.width + enemy.size.width/2, y:size.height/2)
-//        addChild(enemy)
-//
-//        //move enemy right to left, action moves a node relative to its current position.
-//        let actionMove = SKAction.move(to: CGPoint(x: -enemy.size.width/2, y: enemy.position.y),
-//            duration: 5.0)
-//        enemy.run(actionMove)
-    
-    
-    
-// ROTATE ZOMBIE
-//    func rotate(sprite: SKSpriteNode, direction: CGPoint)
-//    {
-////  OLD
-////        sprite.zRotation = CGFloat(atan2(Double(direction.y), Double(direction.x)))
-//
-////  NEW
-//        sprite.zRotation = direction.angle
-//    }
-//
-
-//BLINK ACTION DEMO
-
-//As an example, here's an explanation of the blink action demo in ActionsCatalog:
-//
-//1) Divide the duration by the number of blinks desired in that time period. Call that a "slice" of time. In each slice, the node should be visible for half the time, and invisible for the other half. That is what will make the node appear to blink.
-//
-//2) The truncatingRemainder method returns the remainder of the first parameter (elapsedTime) after being divided by the second parameter (slice). So in this example, it gives you the amount of time that has elapsed in this "slice" calculated earlier.
-//
-//3) The hidden property on a node controls whether it is rendered or not. If the remainder calculated above is in the second half of the slice, it should be hidden (invisible). Otherwise it will be visible. Hence, the blink effect!
-//
-//Note that you can also accomplish a blink effect with a combination of hide() and unhide() actions, as you see in HideScene.
-//
-//*/
-
-
-
-
 

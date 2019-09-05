@@ -9,8 +9,6 @@
 import Foundation
 import CoreGraphics
 
-
-
 //MATHEMATICAL VECTOR BASED HELP ROUTINES
 
 func + (left: CGPoint, right: CGPoint) -> CGPoint {
