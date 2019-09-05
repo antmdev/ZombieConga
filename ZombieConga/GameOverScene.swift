@@ -18,7 +18,6 @@ class GameOverScene: SKScene {
     let won:Bool // boolean status of win / lose
 
     
-    
 /*****************************************************
 INITIALISE PLAYABLE AREA
 ******************************************************/

@@ -57,6 +57,7 @@ GAME CONSTANTS
     // let livesLabel = SKLabelNode(fontNamed: "Chalkduster") //set font for lives
     let livesLabel = SKLabelNode(fontNamed: "Glimstick")
     let catsLabel = SKLabelNode(fontNamed: "Glimstick")
+    let youWinLabel = SKLabelNode(fontNamed: "Glimstick")
     
 /*****************************************************
 INITIALISE PLAYABLE AREA
@@ -174,6 +175,13 @@ BACKGROUND
             },
                 SKAction.wait(forDuration: 1.0)])))
         
+// SPAWN LIVES
+        run(SKAction.repeatForever(SKAction.sequence([SKAction.run()
+            {
+                [weak self] in self?.spawnLife()
+            },
+                SKAction.wait(forDuration: 10.0)])))
+        
 //        debugDrawPlayableArea() //call the debug playable area
         
     //ADD THE CAMERA
@@ -204,6 +212,8 @@ BACKGROUND
         x: playableRect.size.width/2 - CGFloat(20),
         y: -playableRect.size.height/2 + CGFloat(20))
     cameraNode.addChild(catsLabel)  //add as a child of the camera node to keep on screen
+        
+
         
         
         //NOTES ON SIZE & WIDTH
@@ -489,9 +499,50 @@ TOUCH CONTROLS MOVEMENT
     }
     
 /*****************************************************
+SPAWN EXTRA LIFE
+ ******************************************************/
+    
+    func spawnLife() //spawn cat  in random positions accross max playable area
+    {
+       let bonusLife = SKSpriteNode(imageNamed: "game-sprite-2185953_640")
+        bonusLife.name = "life" //name cat for collisions
+        bonusLife.position = CGPoint(
+            x: CGFloat.random(min: cameraRect.minX, max: cameraRect.maxX),
+            y: CGFloat.random(min: cameraRect.minY, max: cameraRect.maxY))
+        bonusLife.zPosition = 50
+        bonusLife.setScale(0) //start scale at 0
+        
+        let turnRed = SKAction.colorize(with: SKColor.red, colorBlendFactor: 1.0, duration: 0.01)
+        bonusLife.run(turnRed)
+        addChild(bonusLife)
+        
+        let appear = SKAction.scale(to: 0.45, duration: 0.5)//grows from nothing to max in 0.5 seconds
+        //adding cat wiggle motion
+        bonusLife.zRotation = -π / 16.0 //rotate cat 1/16 of pi ( negative rotations go clockwise)
+        let leftWiggle = SKAction.rotate(byAngle: π/8.0, duration: 0.5) //rotates counterclockwise by 22.5
+        let rightWiggle = leftWiggle.reversed() //reverse the above
+        let fullWiggle = SKAction.sequence([leftWiggle, rightWiggle]) //combines in a sequence
+        let wiggleWait = SKAction.repeat(fullWiggle, count: 10) // repeat sequence 10 times over 10 seconds
+
+        //GROUP ACTION FOR COMBINING SEQUENCES
+        let scaleUp = SKAction.scale(by: 1.2, duration: 0.25)
+        let scaleDown = scaleUp.reversed()
+        let fullScale = SKAction.sequence(
+            [scaleUp, scaleDown, scaleUp, scaleDown])
+        let group = SKAction.group([fullScale, fullWiggle])
+        let groupWait = SKAction.repeat(group, count: 10)
+
+        //remove cat
+        let disappear = SKAction.scale(to: 0, duration: 0.5) //reduce size to zero after time limit
+        let removeFromParent = SKAction.removeFromParent() //remove sprite
+        let actions = [appear, groupWait, disappear, removeFromParent] //set sequence
+        bonusLife.run(SKAction.sequence(actions))
+    }
+    
+/*****************************************************
  COLLISION DETECTION
  ******************************************************/
-        
+    
     func zombieHit(cat:SKSpriteNode)
     {
 //let train = SKSpriteNode(imageNamed: "cat")
@@ -532,6 +583,11 @@ TOUCH CONTROLS MOVEMENT
         loseCats() // remove two cats method
         lives -= 1 // lose a life
     }
+//PICKED UP EXTRA LIFE
+    
+    func zombieHit(bonusLife: SKSpriteNode) {
+        lives += 1 // Gain a life
+    }
     
     func checkCollisions()
     {
@@ -551,9 +607,6 @@ TOUCH CONTROLS MOVEMENT
         {
             zombieHit(cat: cat)
             
-            //SOUND EFFECT CAT
-//            run(SKAction.playSoundFileNamed("hitCat.wav", waitForCompletion: false))
-           //can now call the constant property and will stop delay of sound on first call.
         }
         
         if invincible {
@@ -576,6 +629,23 @@ TOUCH CONTROLS MOVEMENT
         {
             zombieHit(enemy: enemy)
             
+        }
+    
+
+        var hitLife: [SKSpriteNode] = []
+        enumerateChildNodes(withName: "life")
+        {
+            node, _ in
+            let life = node as! SKSpriteNode
+    
+            if node.frame.insetBy(dx: 20, dy: 20).intersects(self.zombie.frame)
+            {
+                hitLife.append(life)
+            }
+        }
+        for life in hitLife
+        {
+            zombieHit(bonusLife: life)
         }
     }
         
@@ -609,12 +679,15 @@ TOUCH CONTROLS MOVEMENT
         if trainCount >= 15 && !gameOver
         {
             gameOver = true
+            
             print("You win!")
+            
             // 1
             let gameOverScene = GameOverScene(size: size, won: true)
             gameOverScene.scaleMode = scaleMode //matches  current sacle mode in gamescene
             // 2
             let reveal = SKTransition.flipHorizontal(withDuration: 0.5) //transition = flip horizontal
+           
             // 3
             view?.presentScene(gameOverScene, transition: reveal) // reveal transition
             

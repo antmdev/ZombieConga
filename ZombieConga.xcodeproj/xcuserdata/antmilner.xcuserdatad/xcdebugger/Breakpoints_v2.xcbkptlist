@@ -10,11 +10,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ZombieConga/GameOverScene.swift"
-            timestampString = "589208052.08383"
+            timestampString = "589411317.236531"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "61"
-            endingLineNumber = "61"
+            startingLineNumber = "60"
+            endingLineNumber = "60"
             landmarkName = "didMove(to:)"
             landmarkType = "7">
          </BreakpointContent>
