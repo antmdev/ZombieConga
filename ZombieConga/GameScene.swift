@@ -30,6 +30,8 @@ GAME CONSTANTS
         "hitCat.wav", waitForCompletion: false)
     let enemyCollisionSound: SKAction = SKAction.playSoundFileNamed( //Enemy hit sound
         "hitCatLady.wav", waitForCompletion: false)
+    let bonusLifeSound: SKAction = SKAction.playSoundFileNamed( //Enemy hit sound
+        "439889__simonbay__lushlife-levelup.wav", waitForCompletion: false)
     var invincible = false //set the status of the zombie when not contacted by enemy
     let catMovePointsPerSec: CGFloat = 480.0    // keep track of move points per second
     var lives = 5 //adding base number of lives for Zombie
@@ -558,7 +560,8 @@ SPAWN EXTRA LIFE
         
     }
     
-    func zombieHit(enemy: SKSpriteNode) {
+    func zombieHit(enemy: SKSpriteNode)
+    {
         invincible = true
         let blinkTimes = 10.0
         let duration = 3.0
@@ -583,9 +586,12 @@ SPAWN EXTRA LIFE
         loseCats() // remove two cats method
         lives -= 1 // lose a life
     }
+    
 //PICKED UP EXTRA LIFE
     
-    func zombieHit(bonusLife: SKSpriteNode) {
+    func zombieHit(bonusLife: SKSpriteNode)
+    {
+        run(bonusLifeSound)
         lives += 1 // Gain a life
     }
     
@@ -625,6 +631,8 @@ SPAWN EXTRA LIFE
                 hitEnemies.append(enemy)
             }
         }
+        
+        
         for enemy in hitEnemies
         {
             zombieHit(enemy: enemy)
@@ -641,8 +649,10 @@ SPAWN EXTRA LIFE
             if node.frame.insetBy(dx: 20, dy: 20).intersects(self.zombie.frame)
             {
                 hitLife.append(life)
+                node.removeFromParent()
             }
         }
+        
         for life in hitLife
         {
             zombieHit(bonusLife: life)

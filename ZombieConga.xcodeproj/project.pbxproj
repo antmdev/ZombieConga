@@ -23,6 +23,7 @@
 		0FFA5032231D14550034CBA3 /* MainMenuScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FFA5031231D14550034CBA3 /* MainMenuScene.swift */; };
 		0FFA5058231D887F0034CBA3 /* GLIMSTIC.TTF in Resources */ = {isa = PBXBuildFile; fileRef = 0FFA5057231D887F0034CBA3 /* GLIMSTIC.TTF */; };
 		0FFA505A2321A1460034CBA3 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 0FFA50592321A1460034CBA3 /* README.md */; };
+		0FFA505C2321B7A60034CBA3 /* 439889__simonbay__lushlife-levelup.wav in Resources */ = {isa = PBXBuildFile; fileRef = 0FFA505B2321B7A60034CBA3 /* 439889__simonbay__lushlife-levelup.wav */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -44,6 +45,7 @@
 		0FFA5031231D14550034CBA3 /* MainMenuScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainMenuScene.swift; sourceTree = "<group>"; };
 		0FFA5057231D887F0034CBA3 /* GLIMSTIC.TTF */ = {isa = PBXFileReference; lastKnownFileType = file; path = GLIMSTIC.TTF; sourceTree = "<group>"; };
 		0FFA50592321A1460034CBA3 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		0FFA505B2321B7A60034CBA3 /* 439889__simonbay__lushlife-levelup.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = "439889__simonbay__lushlife-levelup.wav"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -95,6 +97,7 @@
 		0FFA50222317F6A20034CBA3 /* Sounds */ = {
 			isa = PBXGroup;
 			children = (
+				0FFA505B2321B7A60034CBA3 /* 439889__simonbay__lushlife-levelup.wav */,
 				0FFA50232317F6A20034CBA3 /* win.wav */,
 				0FFA50242317F6A20034CBA3 /* lose.wav */,
 				0FFA50252317F6A20034CBA3 /* hitCat.wav */,
@@ -165,6 +168,7 @@
 			files = (
 				0FFA5058231D887F0034CBA3 /* GLIMSTIC.TTF in Resources */,
 				0FFA50292317F6A20034CBA3 /* lose.wav in Resources */,
+				0FFA505C2321B7A60034CBA3 /* 439889__simonbay__lushlife-levelup.wav in Resources */,
 				0FFA505A2321A1460034CBA3 /* README.md in Resources */,
 				0FFA50142312A9F60034CBA3 /* Main.storyboard in Resources */,
 				0FFA502C2317F6A20034CBA3 /* backgroundMusic.mp3 in Resources */,
